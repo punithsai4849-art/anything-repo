@@ -27,7 +27,7 @@ from apps.reviews.views import (
     create_or_update_review_view,
     delete_review_view,
 )
-from apps.sharing.views import share_card_view, share_entity_card_view
+from apps.sharing.views import share_card_view, share_entity_card_view, entity_image_proxy_view
 from apps.moderation.views import report_content_view
 
 urlpatterns = [
@@ -58,8 +58,9 @@ urlpatterns = [
     # Moderation Reporting
     path('report/', report_content_view, name='report_content'),
 
-    # Social Share Card Studio
+    # Social Share Card Studio & Image Proxy
     path('reviews/<int:review_id>/share/', share_card_view, name='share_review_card'),
+    path('sharing/entity-image/<slug:slug>/', entity_image_proxy_view, name='share_entity_image'),
 
     # Auth & Profile
     path('login/', login_view, name='login'),

@@ -82,3 +82,22 @@ class SharingStudioTests(TestCase):
         self.assertNotContains(response, 'siteIntroOverlay')
         self.assertNotContains(response, 'dismissIntroOverlay')
         self.assertNotContains(response, 'introCardPop')
+
+    def test_share_card_contains_proxy_image_url(self):
+        url = reverse('share_review_card', kwargs={'review_id': self.review.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse('share_entity_image', kwargs={'slug': self.entity.slug}))
+
+    def test_entity_image_proxy_no_image_404(self):
+        url = reverse('share_entity_image', kwargs={'slug': self.entity.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_entity_image_proxy_ssrf_protection(self):
+        # Set malicious / private IP image URL
+        self.entity.primary_image_url = 'http://127.0.0.1:8000/private.jpg'
+        self.entity.save()
+        url = reverse('share_entity_image', kwargs={'slug': self.entity.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)

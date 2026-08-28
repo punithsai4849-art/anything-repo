@@ -305,6 +305,7 @@ const entityData = {
   name: `{{ entity.name|escapejs }}`,
   category: `{{ category.name|escapejs }}`,
   imageUrl: `{{ entity.image_display_url|default:''|escapejs }}`,
+  proxyImageUrl: `{% url 'share_entity_image' entity.slug %}`,
   reviewTitle: `{{ review.title|default:''|escapejs }}`,
   reviewContent: `{{ review.content|default:''|escapejs }}`,
   entityDescription: `{{ entity.excerpt|default:''|escapejs }}`,
@@ -318,47 +319,34 @@ let loadedImage = null;
 let isImageSafe = true;
 
 async function initStudio() {
-  let imgUrl = entityData.imageUrl;
-  if (imgUrl) {
-    if (imgUrl.startsWith('/')) {
-      imgUrl = window.location.origin + imgUrl;
-    }
+  if (entityData.imageUrl) {
+    const proxyUrl = entityData.proxyImageUrl;
+    const directUrl = entityData.imageUrl;
 
-    // 1. First attempt: fetch via CORS blob to get same-origin ObjectURL
-    // This avoids browser cache collisions with non-crossorigin <img> tags and guarantees clean export
-    try {
-      const fetchUrl = imgUrl.startsWith('http') && !imgUrl.startsWith(window.location.origin)
-        ? (imgUrl + (imgUrl.includes('?') ? '&' : '?') + 'cineast_cors=1')
-        : imgUrl;
-
-      const res = await fetch(fetchUrl, { mode: 'cors' });
-      if (res.ok) {
-        const blob = await res.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const img = new Image();
-        img.onload = () => {
-          loadedImage = img;
-          isImageSafe = true;
-          renderCard();
-        };
-        img.onerror = () => {
-          loadViaDirectImg(imgUrl);
-        };
-        img.src = objectUrl;
-        return;
-      }
-    } catch (e) {
-      console.warn('Direct CORS blob fetch failed, falling back to image element:', e);
-    }
-
-    // 2. Second attempt: standard Image element with anonymous crossOrigin
-    loadViaDirectImg(imgUrl);
+    // 1. Load via same-origin proxy with anonymous crossOrigin
+    // Guarantees clean canvas without CORS tainting and adheres to CSP
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      loadedImage = img;
+      isImageSafe = true;
+      renderCard();
+    };
+    img.onerror = () => {
+      console.warn('Same-origin proxy image failed, trying direct URL');
+      loadDirectFallback(directUrl);
+    };
+    img.src = proxyUrl;
   } else {
     renderCard();
   }
 }
 
-function loadViaDirectImg(imgUrl) {
+function loadDirectFallback(imgUrl) {
+  if (!imgUrl) {
+    renderCard();
+    return;
+  }
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
@@ -367,15 +355,16 @@ function loadViaDirectImg(imgUrl) {
     renderCard();
   };
   img.onerror = () => {
-    // If anonymous fails due to third-party server headers, load without crossOrigin for preview only
+    // If external server blocks crossOrigin, load without crossOrigin for preview
     const fallbackImg = new Image();
     fallbackImg.onload = () => {
       loadedImage = fallbackImg;
-      isImageSafe = false; // Tainted canvas: safe fallback export will be used
+      isImageSafe = false; // Fresh canvas fallback will be used on export
       renderCard();
     };
     fallbackImg.onerror = () => {
       loadedImage = null;
+      isImageSafe = true;
       renderCard();
     };
     fallbackImg.src = imgUrl;
@@ -1478,42 +1467,52 @@ function getCanvasBlobSafe(callback) {
     return;
   }
 
-  // If the loaded image was marked safe or null, try standard export first
-  if (isImageSafe || !loadedImage) {
-    try {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          callback(blob);
-        } else {
-          exportWithoutTaintedImage(callback);
-        }
-      }, 'image/png');
-      return;
-    } catch (err) {
-      console.warn('Canvas export failed, falling back to safe export:', err);
-    }
-  }
-
-  // Fallback: tainted image bypass
-  exportWithoutTaintedImage(callback);
-}
-
-function exportWithoutTaintedImage(callback) {
-  const canvas = document.getElementById('shareCanvas');
-  const tempImg = loadedImage;
-  loadedImage = null; // Temporarily swap out tainted remote image
-  renderCard();
-  
+  // Attempt standard export
   try {
     canvas.toBlob((blob) => {
-      loadedImage = tempImg; // Restore preview
-      renderCard();
+      if (blob) {
+        callback(blob);
+      } else {
+        exportWithFreshCanvas(callback);
+      }
+    }, 'image/png');
+  } catch (err) {
+    console.warn('Canvas export failed, using fresh canvas export:', err);
+    exportWithFreshCanvas(callback);
+  }
+}
+
+function exportWithFreshCanvas(callback) {
+  try {
+    const origCanvas = document.getElementById('shareCanvas');
+    const freshCanvas = document.createElement('canvas');
+    freshCanvas.width = origCanvas.width;
+    freshCanvas.height = origCanvas.height;
+    const freshCtx = freshCanvas.getContext('2d');
+
+    // To guarantee the fresh canvas is never tainted, disable remote image if it was untrusted
+    const tempImg = loadedImage;
+    if (!isImageSafe) {
+      loadedImage = null;
+    }
+
+    if (currentStyle === 'letterboxd') {
+      renderLetterboxdCinema(freshCtx, freshCanvas.width, freshCanvas.height);
+    } else if (currentStyle === 'minimal') {
+      renderMinimalEditorial(freshCtx, freshCanvas.width, freshCanvas.height);
+    } else if (currentStyle === 'quote') {
+      renderPerspectiveFocus(freshCtx, freshCanvas.width, freshCanvas.height);
+    } else if (currentStyle === 'dark') {
+      renderAmbientDark(freshCtx, freshCanvas.width, freshCanvas.height);
+    }
+
+    loadedImage = tempImg;
+
+    freshCanvas.toBlob((blob) => {
       callback(blob);
     }, 'image/png');
-  } catch (secondErr) {
-    loadedImage = tempImg;
-    renderCard();
-    console.error('Safe export also failed:', secondErr);
+  } catch (e) {
+    console.error('Fresh canvas export failed:', e);
     callback(null);
   }
 }
@@ -1620,6 +1619,15 @@ async function copyCardUrlToClipboard() {
   }
 }
 
+function triggerFileDownload(url, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = url;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 function downloadShareCard() {
   const canvas = document.getElementById('shareCanvas');
   if (!canvas) return;
@@ -1627,37 +1635,47 @@ function downloadShareCard() {
   const safeTitle = (entityData.name || 'perspective').toLowerCase().replace(/[^a-z0-9]/g, '-');
   const filename = `anything-${safeTitle}-${currentStyle}-${currentFormat}.png`;
 
-  // 1. First attempt: Synchronous toDataURL (direct user gesture, not blocked by popup guards)
-  if (isImageSafe || !loadedImage) {
+  // 1. Direct synchronous export attempt
+  if (isImageSafe) {
     try {
       const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      triggerFileDownload(dataUrl, filename);
       showToast('✨ Card image downloaded successfully!');
       return;
     } catch (syncErr) {
-      console.warn('Sync toDataURL download failed, falling back to blob method:', syncErr);
+      console.warn('Synchronous export failed, trying blob export:', syncErr);
     }
   }
 
-  // 2. Fallback: getCanvasBlobSafe
+  // 2. Safe blob export
   getCanvasBlobSafe((blob) => {
     if (blob) {
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      triggerFileDownload(url, filename);
       setTimeout(() => URL.revokeObjectURL(url), 3000);
       showToast('✨ Card image downloaded successfully!');
     } else {
-      showToast('❌ Unable to export card image for download', true);
+      // 3. Absolute failsafe: fresh canvas synchronous dataURL
+      try {
+        const freshCanvas = document.createElement('canvas');
+        freshCanvas.width = canvas.width;
+        freshCanvas.height = canvas.height;
+        const freshCtx = freshCanvas.getContext('2d');
+        const tempImg = loadedImage;
+        loadedImage = null;
+        if (currentStyle === 'letterboxd') {
+          renderLetterboxdCinema(freshCtx, freshCanvas.width, freshCanvas.height);
+        } else {
+          renderMinimalEditorial(freshCtx, freshCanvas.width, freshCanvas.height);
+        }
+        loadedImage = tempImg;
+        const dataUrl = freshCanvas.toDataURL('image/png');
+        triggerFileDownload(dataUrl, filename);
+        showToast('✨ Card image downloaded successfully!');
+      } catch (finalErr) {
+        console.error('Final export failed:', finalErr);
+        showToast('❌ Unable to export card image for download', true);
+      }
     }
   });
 }
