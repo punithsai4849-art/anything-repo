@@ -60,7 +60,11 @@
           2. Visual Style Template
         </label>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <button type="button" class="btn btn-secondary style-btn active" onclick="setShareStyle('minimal', this)">
+          <button type="button" class="btn btn-secondary style-btn active" onclick="setShareStyle('letterboxd', this)">
+            <span class="style-btn-title">🎬 Letterboxd Cinema</span>
+            <span class="style-btn-desc">Cinematic poster glow, green stars & review card</span>
+          </button>
+          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('minimal', this)">
             <span class="style-btn-title">✨ Minimal Editorial</span>
             <span class="style-btn-desc">High-contrast Swiss poster & category badge</span>
           </button>
@@ -77,6 +81,11 @@
 
       <!-- 3. Export Action Buttons -->
       <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+        <!-- Primary Instagram Stories Button -->
+        <button type="button" class="btn btn-primary btn-lg" onclick="shareToInstagramStories()" id="btnInstagramStory" style="width: 100%; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 0.55rem; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border: 2.5px solid #111111; box-shadow: var(--shadow-brutal-md); color: #ffffff; font-size: 1.05rem; letter-spacing: -0.01em; cursor: pointer;">
+          <span style="font-size: 1.35rem;">📸</span> Share to Instagram Stories
+        </button>
+
         <button type="button" class="btn btn-primary btn-lg" onclick="downloadShareCard()" style="box-shadow: var(--shadow-brutal-md); width: 100%; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
           <span>📥</span> Download High-Res PNG
         </button>
@@ -166,6 +175,12 @@
           </div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;">
             
+            <!-- Instagram Stories -->
+            <a href="javascript:void(0)" onclick="closeShareModal(); shareToInstagramStories();" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">📸</span>
+              <span>Instagram</span>
+            </a>
+
             <!-- WhatsApp -->
             <a href="#" id="shareLinkWhatsApp" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #E7FCE9; color: #128C7E; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
               <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">💬</span>
@@ -220,11 +235,71 @@
     </div>
   </div>
 
+  <!-- Instagram Stories Help & Quick Post Modal -->
+  <div id="instagramGuideModal" class="cineast-modal" aria-hidden="true" style="display: none; position: fixed; inset: 0; z-index: 999999; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 1rem;">
+    <div class="share-modal-dialog" style="background: var(--bg-card, #ffffff); border: 3px solid #111111; border-radius: var(--radius-lg, 16px); box-shadow: 10px 10px 0px #111111; width: 100%; max-width: 480px; overflow: hidden;">
+      
+      <div style="padding: 1.15rem 1.5rem; border-bottom: 2px solid #111111; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); color: #ffffff;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.35rem;">📸</span>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; letter-spacing: -0.02em; color: #ffffff;">Post to Instagram Stories</h3>
+        </div>
+        <button type="button" onclick="closeInstagramGuideModal()" style="background: #ffffff; border: 2px solid #111111; border-radius: 8px; width: 32px; height: 32px; font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px #111111;">
+          ✕
+        </button>
+      </div>
+
+      <div style="padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; background: #e6ffed; border: 2px solid #027a48; border-radius: 12px; padding: 0.75rem 1rem; margin-bottom: 1.25rem;">
+          <span style="font-size: 1.4rem;">✅</span>
+          <div style="font-size: 0.88rem; font-weight: 800; color: #027a48;">
+            High-Res 9:16 Story Card downloaded and copied to your clipboard!
+          </div>
+        </div>
+
+        <div style="font-size: 0.92rem; font-weight: 800; margin-bottom: 0.75rem; color: #111111;">
+          How to share on Instagram in seconds:
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span style="background: #111111; color: #ffffff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; flex-shrink: 0;">1</span>
+            <div style="font-size: 0.88rem; color: #333333; line-height: 1.4;">
+              Open the <strong>Instagram app</strong> on your phone and swipe right to create a new <strong>Story</strong>.
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span style="background: #111111; color: #ffffff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; flex-shrink: 0;">2</span>
+            <div style="font-size: 0.88rem; color: #333333; line-height: 1.4;">
+              Select the downloaded image from your <strong>camera roll / gallery</strong>, <em>OR</em> tap the <strong>Aa (Text)</strong> tool and tap <strong>Paste</strong> to drop it as a movable card!
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span style="background: #111111; color: #ffffff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; flex-shrink: 0;">3</span>
+            <div style="font-size: 0.88rem; color: #333333; line-height: 1.4;">
+              Add interactive stickers, music, or link, and share to your Story!
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex: 1; text-align: center; text-decoration: none; font-weight: 800; padding: 0.75rem; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); border: 2px solid #111111; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <span>📸</span> Open Instagram
+          </a>
+          <button type="button" class="btn btn-secondary" onclick="closeInstagramGuideModal()" style="font-weight: 800; padding: 0.75rem 1.25rem;">
+            Done
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 let currentFormat = 'story'; // 'story' (1080x1920), 'portrait' (1080x1350), 'square' (1080x1080)
-let currentStyle = 'minimal'; // 'minimal', 'quote', 'dark'
+let currentStyle = 'letterboxd'; // 'letterboxd', 'minimal', 'quote', 'dark'
 
 const entityData = {
   name: `{{ entity.name|escapejs }}`,
@@ -409,13 +484,359 @@ function renderCard() {
 
   ctx.clearRect(0, 0, W, H);
 
-  if (currentStyle === 'minimal') {
+  if (currentStyle === 'letterboxd') {
+    renderLetterboxdCinema(ctx, W, H);
+  } else if (currentStyle === 'minimal') {
     renderMinimalEditorial(ctx, W, H);
   } else if (currentStyle === 'quote') {
     renderPerspectiveFocus(ctx, W, H);
   } else if (currentStyle === 'dark') {
     renderAmbientDark(ctx, W, H);
   }
+}
+
+/* =========================================================================
+   0. LETTERBOXD CINEMA (Iconic 9:16 Instagram Story & Review Card)
+   ========================================================================= */
+function renderLetterboxdCinema(ctx, W, H) {
+  // 1. Deep Letterboxd Charcoal Background
+  ctx.fillStyle = '#14181C';
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Ambient Poster Backdrop Glow
+  if (loadedImage) {
+    ctx.save();
+    ctx.globalAlpha = 0.24;
+    drawImageAspectFill(ctx, loadedImage, 0, 0, W, H);
+    ctx.restore();
+
+    // Dark cinematic vignette
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, 'rgba(20, 24, 28, 0.75)');
+    bgGrad.addColorStop(0.35, 'rgba(20, 24, 28, 0.40)');
+    bgGrad.addColorStop(0.7, 'rgba(20, 24, 28, 0.85)');
+    bgGrad.addColorStop(1, 'rgba(20, 24, 28, 0.98)');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+  } else {
+    const radGrad = ctx.createRadialGradient(W / 2, H * 0.4, 60, W / 2, H * 0.4, W * 0.75);
+    radGrad.addColorStop(0, 'rgba(0, 224, 84, 0.16)');
+    radGrad.addColorStop(1, 'rgba(20, 24, 28, 0)');
+    ctx.fillStyle = radGrad;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // 3. Subtle Outer Frame / Story Safe Area Border
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.strokeRect(28, 28, W - 56, H - 56);
+
+  // 4. Header Bar (Instagram Safe Area: y = 140 to 190)
+  const topPadY = currentFormat === 'story' ? 140 : 80;
+  
+  // Platform Pill Badge (Left)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  drawRoundedRect(ctx, 70, topPadY, 210, 48, 24);
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.stroke();
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '900 22px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('anything...', 92, topPadY + 24);
+
+  // Category Pill (Right)
+  const catText = (entityData.category || 'PERSPECTIVE').toUpperCase();
+  ctx.font = '800 20px -apple-system, sans-serif';
+  const catW = ctx.measureText(catText).width;
+  const catPillW = catW + 36;
+  const catPillX = W - 70 - catPillW;
+
+  ctx.fillStyle = 'rgba(0, 224, 84, 0.16)';
+  drawRoundedRect(ctx, catPillX, topPadY, catPillW, 48, 24);
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#00E054';
+  ctx.stroke();
+
+  ctx.fillStyle = '#00E054';
+  ctx.fillText(catText, catPillX + 18, topPadY + 24);
+
+  // 5. Layout by Aspect Ratio
+  if (currentFormat === 'story') {
+    // 9:16 Story Layout
+    const posterW = 460;
+    const posterH = 650;
+    const posterX = (W - posterW) / 2;
+    const posterY = topPadY + 70;
+
+    // Drop Shadow for Poster
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+    ctx.shadowBlur = 45;
+    ctx.shadowOffsetY = 24;
+    ctx.fillStyle = '#1A1E24';
+    drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 18);
+    ctx.fill();
+    ctx.restore();
+
+    // Draw Poster Artwork
+    if (loadedImage) {
+      ctx.save();
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 18);
+      ctx.clip();
+      drawImageAspectFill(ctx, loadedImage, posterX, posterY, posterW, posterH);
+      ctx.restore();
+
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 18);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = '#1E242B';
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 18);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.stroke();
+
+      ctx.font = '900 64px -apple-system, sans-serif';
+      ctx.fillStyle = '#00E054';
+      ctx.textAlign = 'center';
+      ctx.fillText(entityData.category.slice(0, 3).toUpperCase(), posterX + posterW / 2, posterY + posterH / 2);
+      ctx.textAlign = 'left';
+    }
+
+    let currentY = posterY + posterH + 40;
+
+    // Entity Title (Centered)
+    ctx.textAlign = 'center';
+    ctx.font = '900 52px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, W - 140);
+    for (let i = 0; i < Math.min(titleLines.length, 2); i++) {
+      ctx.fillText(titleLines[i], W / 2, currentY);
+      currentY += 60;
+    }
+
+    // Subtitle: Year & Creator
+    const metaItems = [entityData.year, entityData.creator].filter(Boolean).join(' • ');
+    if (metaItems) {
+      ctx.font = '700 26px -apple-system, sans-serif';
+      ctx.fillStyle = '#8899A6';
+      ctx.fillText(metaItems, W / 2, currentY);
+      currentY += 40;
+    } else {
+      currentY += 10;
+    }
+
+    // Star Rating Display (Letterboxd Green Stars)
+    if (entityData.ratingScore) {
+      currentY += 12;
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      const starSize = 44;
+      const totalStarsW = 5 * starSize + 4 * (starSize * 0.35);
+      const starStartX = (W - totalStarsW) / 2;
+      drawStarRating(ctx, starStartX, currentY + 20, scoreVal, starSize, '#00E054', 'rgba(255, 255, 255, 0.2)');
+      currentY += 62;
+    }
+    ctx.textAlign = 'left';
+
+    // Letterboxd Style Review Bubble Card
+    const reviewPadX = 70;
+    const reviewAvailW = W - reviewPadX * 2;
+    const reviewBoxH = Math.max(H - currentY - 170, 240);
+
+    renderLetterboxdReviewCard(ctx, reviewPadX, currentY, reviewAvailW, reviewBoxH);
+
+  } else if (currentFormat === 'portrait') {
+    // 4:5 Portrait Layout
+    const posterW = 340;
+    const posterH = 480;
+    const posterX = (W - posterW) / 2;
+    const posterY = topPadY + 50;
+
+    if (loadedImage) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetY = 18;
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 16);
+      ctx.fillStyle = '#1A1E24';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 16);
+      ctx.clip();
+      drawImageAspectFill(ctx, loadedImage, posterX, posterY, posterW, posterH);
+      ctx.restore();
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 16);
+      ctx.stroke();
+    }
+
+    let currentY = posterY + posterH + 30;
+
+    ctx.textAlign = 'center';
+    ctx.font = '900 46px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, W - 140);
+    ctx.fillText(titleLines[0] || entityData.name, W / 2, currentY);
+    currentY += 54;
+
+    if (entityData.ratingScore) {
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      const starSize = 36;
+      const totalStarsW = 5 * starSize + 4 * (starSize * 0.35);
+      drawStarRating(ctx, (W - totalStarsW) / 2, currentY + 16, scoreVal, starSize, '#00E054', 'rgba(255, 255, 255, 0.2)');
+      currentY += 50;
+    }
+    ctx.textAlign = 'left';
+
+    const reviewPadX = 70;
+    const reviewBoxH = Math.max(H - currentY - 140, 180);
+    renderLetterboxdReviewCard(ctx, reviewPadX, currentY, W - reviewPadX * 2, reviewBoxH);
+
+  } else {
+    // 1:1 Square Layout
+    const posterW = 280;
+    const posterH = 360;
+    const posterX = (W - posterW) / 2;
+    const posterY = topPadY + 40;
+
+    if (loadedImage) {
+      ctx.save();
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 14);
+      ctx.clip();
+      drawImageAspectFill(ctx, loadedImage, posterX, posterY, posterW, posterH);
+      ctx.restore();
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      drawRoundedRect(ctx, posterX, posterY, posterW, posterH, 14);
+      ctx.stroke();
+    }
+
+    let currentY = posterY + posterH + 24;
+
+    ctx.textAlign = 'center';
+    ctx.font = '900 42px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, W - 140);
+    ctx.fillText(titleLines[0] || entityData.name, W / 2, currentY);
+    currentY += 48;
+
+    if (entityData.ratingScore) {
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      const starSize = 32;
+      const totalStarsW = 5 * starSize + 4 * (starSize * 0.35);
+      drawStarRating(ctx, (W - totalStarsW) / 2, currentY + 14, scoreVal, starSize, '#00E054', 'rgba(255, 255, 255, 0.2)');
+      currentY += 44;
+    }
+    ctx.textAlign = 'left';
+
+    const reviewPadX = 70;
+    const reviewBoxH = Math.max(H - currentY - 120, 140);
+    renderLetterboxdReviewCard(ctx, reviewPadX, currentY, W - reviewPadX * 2, reviewBoxH);
+  }
+
+  // 6. Letterboxd Footer Signature
+  renderLetterboxdFooter(ctx, W, H);
+}
+
+function renderLetterboxdReviewCard(ctx, x, y, width, height) {
+  // Translucent Frosted Obsidian Capsule
+  ctx.fillStyle = 'rgba(26, 33, 41, 0.90)';
+  drawRoundedRect(ctx, x, y, width, height, 18);
+  ctx.fill();
+
+  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+  drawRoundedRect(ctx, x, y, width, height, 18);
+  ctx.stroke();
+
+  // Reviewer Attribution Header Bar
+  const userY = y + 26;
+  const userInitial = (entityData.author || 'A').charAt(0).toUpperCase();
+
+  // User Avatar Circle
+  ctx.fillStyle = '#00E054';
+  ctx.beginPath();
+  ctx.arc(x + 36, userY + 16, 20, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.font = '900 20px -apple-system, sans-serif';
+  ctx.fillStyle = '#14181C';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(userInitial, x + 36, userY + 16);
+  ctx.textAlign = 'left';
+
+  // Review by @username
+  ctx.font = '700 24px -apple-system, sans-serif';
+  ctx.fillStyle = '#8899A6';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Review by ', x + 68, userY + 16);
+
+  const authorName = entityData.author ? `@${entityData.author}` : 'Community Cineast';
+  const revByW = ctx.measureText('Review by ').width;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '800 24px -apple-system, sans-serif';
+  ctx.fillText(authorName, x + 68 + revByW, userY + 16);
+
+  // Review Pull-Quote Text
+  const rawText = entityData.reviewContent || entityData.entityDescription || `A standout ${entityData.category.toLowerCase()} explored and evaluated on anything...`;
+  const quoteText = rawText.startsWith('“') || rawText.startsWith('"') ? rawText : `“${rawText}”`;
+
+  const textPadX = x + 32;
+  const textPadY = userY + 52;
+  const maxTextW = width - 64;
+
+  ctx.font = '500 34px Georgia, "Times New Roman", serif';
+  ctx.fillStyle = '#E1E7ED';
+  ctx.textBaseline = 'top';
+  const qLines = getWrappedLines(ctx, quoteText, maxTextW);
+  const maxAllowedLines = Math.floor((height - 90) / 46);
+
+  let drawY = textPadY;
+  for (let i = 0; i < Math.min(qLines.length, maxAllowedLines); i++) {
+    let lineStr = qLines[i];
+    if (i === maxAllowedLines - 1 && qLines.length > maxAllowedLines) {
+      lineStr = lineStr.replace(/[\.,; ]+$/, '') + '...”';
+    }
+    ctx.fillText(lineStr, textPadX, drawY);
+    drawY += 46;
+  }
+}
+
+function renderLetterboxdFooter(ctx, W, H) {
+  // Safe zone clear of Instagram Stories message input bar
+  const footerY = H - (currentFormat === 'story' ? 100 : 70);
+
+  ctx.font = '800 24px -apple-system, sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.fillText('Read & share reviews on', 70, footerY);
+
+  const labelW = ctx.measureText('Read & share reviews on ').width;
+  ctx.font = '900 26px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.fillStyle = '#00E054';
+  ctx.fillText('anything...', 70 + labelW, footerY);
+
+  // Subtle Story watermark on right
+  const rightTag = 'INSTAGRAM STORY';
+  ctx.font = '800 18px -apple-system, sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+  const rightW = ctx.measureText(rightTag).width;
+  ctx.fillText(rightTag, W - 70 - rightW, footerY);
 }
 
 /* =========================================================================
@@ -1200,21 +1621,123 @@ async function copyCardUrlToClipboard() {
 }
 
 function downloadShareCard() {
+  const canvas = document.getElementById('shareCanvas');
+  if (!canvas) return;
+
+  const safeTitle = (entityData.name || 'perspective').toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const filename = `anything-${safeTitle}-${currentStyle}-${currentFormat}.png`;
+
+  // 1. First attempt: Synchronous toDataURL (direct user gesture, not blocked by popup guards)
+  if (isImageSafe || !loadedImage) {
+    try {
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('✨ Card image downloaded successfully!');
+      return;
+    } catch (syncErr) {
+      console.warn('Sync toDataURL download failed, falling back to blob method:', syncErr);
+    }
+  }
+
+  // 2. Fallback: getCanvasBlobSafe
   getCanvasBlobSafe((blob) => {
     if (blob) {
-      const safeTitle = (entityData.name || 'perspective').toLowerCase().replace(/[^a-z0-9]/g, '-');
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.download = `anything-${safeTitle}-${currentStyle}-${currentFormat}.png`;
+      link.download = filename;
       link.href = url;
+      document.body.appendChild(link);
       link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
       showToast('✨ Card image downloaded successfully!');
     } else {
       showToast('❌ Unable to export card image for download', true);
     }
   });
 }
+
+async function shareToInstagramStories() {
+  // 1. Ensure format is 'story' (9:16 - 1080x1920) for optimal Instagram Story display
+  if (currentFormat !== 'story') {
+    const storyBtn = document.getElementById('btnFmtStory');
+    if (storyBtn) setShareFormat('story', storyBtn);
+  }
+
+  const safeTitle = (entityData.name || 'perspective').replace(/[^a-zA-Z0-9 ]/g, '');
+
+  getCanvasBlobSafe(async (blob) => {
+    if (!blob) {
+      downloadShareCard();
+      return;
+    }
+
+    const file = new File([blob], `${safeTitle}-instagram-story.png`, { type: 'image/png' });
+
+    // On mobile devices (iOS / Android), Web Share API allows sharing file directly to Instagram Stories
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `${entityData.name} on anything...`,
+          text: `Perspective on ${entityData.name} on anything...`
+        });
+        showToast('📸 Shared to Instagram Stories!');
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        console.warn('Native share failed or cancelled:', err);
+      }
+    }
+
+    // On desktop or devices without native file share:
+    // Copy image directly to clipboard (for pasting as movable sticker into Stories)
+    try {
+      if (navigator.clipboard && navigator.clipboard.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+      }
+    } catch (clipErr) {
+      console.warn('Clipboard write failed:', clipErr);
+    }
+
+    // Trigger high-res 9:16 PNG download
+    downloadShareCard();
+
+    // Show guide modal with direct instructions on posting to Instagram
+    openInstagramGuideModal();
+  });
+}
+
+function openInstagramGuideModal() {
+  const modal = document.getElementById('instagramGuideModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeInstagramGuideModal() {
+  const modal = document.getElementById('instagramGuideModal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+// Close Instagram Guide Modal on backdrop click
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('instagramGuideModal');
+  if (modal && e.target === modal) {
+    closeInstagramGuideModal();
+  }
+});
 
 async function copyCardToClipboard() {
   const btn = document.getElementById('btnCopyClipboard');
