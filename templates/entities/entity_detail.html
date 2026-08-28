@@ -79,6 +79,10 @@
             </a>
           {% endif %}
           
+          <a href="{% url 'share_entity_card' entity.slug %}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+            <span>🚀</span> Share Card
+          </a>
+
           <button type="button" class="btn btn-ghost btn-sm" onclick="openReportModal('entity', '{{ entity.id }}')">
             Report
           </button>

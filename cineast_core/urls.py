@@ -27,7 +27,7 @@ from apps.reviews.views import (
     create_or_update_review_view,
     delete_review_view,
 )
-from apps.sharing.views import share_card_view
+from apps.sharing.views import share_card_view, share_entity_card_view
 from apps.moderation.views import report_content_view
 
 urlpatterns = [
@@ -42,6 +42,7 @@ urlpatterns = [
     path('discover/', entity_list_view, name='entity_list'),
     path('entities/', entity_list_view, name='entity_list_alt'),
     path('entities/add/', entity_create_view, name='entity_add'),
+    path('entities/<slug:slug>/share/', share_entity_card_view, name='share_entity_card'),
     path('entities/<slug:slug>/', entity_detail_view, name='entity_detail'),
     path('entities/<slug:slug>/edit/', entity_edit_view, name='entity_edit'),
     

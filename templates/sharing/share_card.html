@@ -4,6 +4,16 @@
 {% block title %}Share Perspective — {{ entity.name }} — anything...{% endblock %}
 
 {% block content %}
+<style>
+  .social-share-tile:hover {
+    transform: translate(-2px, -2px) !important;
+    box-shadow: 5px 5px 0px #111111 !important;
+  }
+  .social-share-tile:active {
+    transform: translate(1px, 1px) !important;
+    box-shadow: 1px 1px 0px #111111 !important;
+  }
+</style>
 <div class="container share-studio-container">
   
   <div class="share-studio-header" style="text-align: center; margin-bottom: 1.5rem;">
@@ -74,7 +84,7 @@
           <button type="button" class="btn btn-secondary" onclick="copyCardToClipboard()" id="btnCopyClipboard" style="font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: normal;">
             <span>📋</span> Copy Image
           </button>
-          <button type="button" class="btn btn-secondary" onclick="nativeWebShare()" id="btnWebShare" style="font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: normal;">
+          <button type="button" class="btn btn-secondary" onclick="openShareModal()" id="btnWebShare" style="font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: normal; background: #fff0ed; border: 2px solid var(--cineast-primary); color: var(--cineast-primary);">
             <span>🚀</span> Share Card
           </button>
         </div>
@@ -103,6 +113,113 @@
 
   </div>
 
+  <!-- Neubrutalist Social Share Modal -->
+  <div id="shareModal" class="cineast-modal" aria-hidden="true" style="display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 1rem;">
+    <div class="share-modal-dialog" style="background: var(--bg-card, #ffffff); border: 3px solid #111111; border-radius: var(--radius-lg, 16px); box-shadow: 10px 10px 0px #111111; width: 100%; max-width: 520px; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div style="padding: 1.15rem 1.5rem; border-bottom: 2px solid #111111; display: flex; justify-content: space-between; align-items: center; background: #FFF4F0;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.3rem;">🚀</span>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; letter-spacing: -0.02em;">Share Perspective Card</h3>
+        </div>
+        <button type="button" onclick="closeShareModal()" style="background: #ffffff; border: 2px solid #111111; border-radius: 8px; width: 32px; height: 32px; font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px #111111;">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding: 1.5rem; max-height: 75vh; overflow-y: auto;">
+        
+        <!-- Summary Preview Box -->
+        <div style="display: flex; gap: 1rem; align-items: center; background: var(--bg-subtle, #f5f5f7); border: 2px solid #111111; border-radius: 12px; padding: 0.75rem; margin-bottom: 1.25rem; box-shadow: 3px 3px 0px #111111;">
+          <div style="width: 58px; height: 76px; border-radius: 6px; border: 1.5px solid #111111; overflow: hidden; background: #111111; flex-shrink: 0;">
+            <img id="modalPreviewThumb" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="overflow: hidden;">
+            <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--cineast-primary, #FF4433); letter-spacing: 0.05em; margin-bottom: 0.15rem;">
+              {{ category.name }}
+            </div>
+            <div style="font-weight: 900; font-size: 1.05rem; color: var(--text-primary, #111111); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              {{ entity.name }}
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary, #555555); margin-top: 0.2rem;">
+              {% if rating %}Rated {{ rating.score }}★{% if author %} by @{{ author.username }}{% endif %}{% else %}Curated Perspective Card{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Copy Actions -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="copyCardUrlToClipboard()" id="btnModalCopyLink" style="font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem;">
+            <span id="btnModalCopyLinkIcon">🔗</span> <span id="btnModalCopyLinkText">Copy Link</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="copyCardToClipboard()" id="btnModalCopyImg" style="font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem;">
+            <span id="btnModalCopyImgIcon">📋</span> <span id="btnModalCopyImgText">Copy Image</span>
+          </button>
+        </div>
+
+        <!-- Direct Social Platform 1-Click Share Grid -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted, #777777); letter-spacing: 0.06em; margin-bottom: 0.65rem;">
+            Share to Social Channels
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;">
+            
+            <!-- WhatsApp -->
+            <a href="#" id="shareLinkWhatsApp" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #E7FCE9; color: #128C7E; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">💬</span>
+              <span>WhatsApp</span>
+            </a>
+
+            <!-- X / Twitter -->
+            <a href="#" id="shareLinkTwitter" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #000000; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem; font-weight: 900;">𝕏</span>
+              <span>X / Twitter</span>
+            </a>
+
+            <!-- LinkedIn -->
+            <a href="#" id="shareLinkLinkedIn" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #E8F4F9; color: #0A66C2; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">💼</span>
+              <span>LinkedIn</span>
+            </a>
+
+            <!-- Reddit -->
+            <a href="#" id="shareLinkReddit" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #FFF0EB; color: #FF4500; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">🤖</span>
+              <span>Reddit</span>
+            </a>
+
+            <!-- Telegram -->
+            <a href="#" id="shareLinkTelegram" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #EBF7FC; color: #2AABEE; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">✈️</span>
+              <span>Telegram</span>
+            </a>
+
+            <!-- Facebook -->
+            <a href="#" id="shareLinkFacebook" target="_blank" rel="noopener noreferrer" class="social-share-tile" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.4rem; border: 2px solid #111111; border-radius: 12px; background: #EDF2FB; color: #1877F2; text-decoration: none; font-weight: 800; font-size: 0.82rem; box-shadow: 3px 3px 0px #111111; transition: transform 0.1s ease;">
+              <span style="font-size: 1.4rem; margin-bottom: 0.2rem;">📘</span>
+              <span>Facebook</span>
+            </a>
+
+          </div>
+        </div>
+
+        <!-- Native Device Share Sheet -->
+        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+          <button type="button" class="btn btn-primary" onclick="triggerNativeShareFromModal()" id="btnModalNativeShare" style="width: 100%; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; box-shadow: 3px 3px 0px #111111;">
+            <span>📱</span> Device Share Sheet (with Image File)
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="downloadShareCard(); closeShareModal();" style="width: 100%; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem;">
+            <span>📥</span> Download High-Res PNG File
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -114,9 +231,10 @@ const entityData = {
   category: `{{ category.name|escapejs }}`,
   imageUrl: `{{ entity.image_display_url|default:''|escapejs }}`,
   reviewTitle: `{{ review.title|default:''|escapejs }}`,
-  reviewContent: `{{ review.content|escapejs }}`,
+  reviewContent: `{{ review.content|default:''|escapejs }}`,
+  entityDescription: `{{ entity.excerpt|default:''|escapejs }}`,
   ratingScore: `{{ rating.score|default:'' }}`,
-  author: `{{ author.username|escapejs }}`,
+  author: `{{ author.username|default:''|escapejs }}`,
   year: `{{ year|default:''|escapejs }}`,
   creator: `{{ creator|default:''|escapejs }}`
 };
@@ -124,38 +242,72 @@ const entityData = {
 let loadedImage = null;
 let isImageSafe = true;
 
-function initStudio() {
+async function initStudio() {
   let imgUrl = entityData.imageUrl;
   if (imgUrl) {
     if (imgUrl.startsWith('/')) {
       imgUrl = window.location.origin + imgUrl;
     }
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      loadedImage = img;
-      isImageSafe = true;
-      renderCard();
-    };
-    img.onerror = () => {
-      // Fallback: load image without crossOrigin for rendering if possible
-      const fallbackImg = new Image();
-      fallbackImg.onload = () => {
-        loadedImage = fallbackImg;
-        isImageSafe = false; // Tainted
-        renderCard();
-      };
-      fallbackImg.onerror = () => {
-        loadedImage = null;
-        renderCard();
-      };
-      fallbackImg.src = imgUrl;
-    };
-    img.src = imgUrl;
+
+    // 1. First attempt: fetch via CORS blob to get same-origin ObjectURL
+    // This avoids browser cache collisions with non-crossorigin <img> tags and guarantees clean export
+    try {
+      const fetchUrl = imgUrl.startsWith('http') && !imgUrl.startsWith(window.location.origin)
+        ? (imgUrl + (imgUrl.includes('?') ? '&' : '?') + 'cineast_cors=1')
+        : imgUrl;
+
+      const res = await fetch(fetchUrl, { mode: 'cors' });
+      if (res.ok) {
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          loadedImage = img;
+          isImageSafe = true;
+          renderCard();
+        };
+        img.onerror = () => {
+          loadViaDirectImg(imgUrl);
+        };
+        img.src = objectUrl;
+        return;
+      }
+    } catch (e) {
+      console.warn('Direct CORS blob fetch failed, falling back to image element:', e);
+    }
+
+    // 2. Second attempt: standard Image element with anonymous crossOrigin
+    loadViaDirectImg(imgUrl);
   } else {
     renderCard();
   }
 }
+
+function loadViaDirectImg(imgUrl) {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    loadedImage = img;
+    isImageSafe = true;
+    renderCard();
+  };
+  img.onerror = () => {
+    // If anonymous fails due to third-party server headers, load without crossOrigin for preview only
+    const fallbackImg = new Image();
+    fallbackImg.onload = () => {
+      loadedImage = fallbackImg;
+      isImageSafe = false; // Tainted canvas: safe fallback export will be used
+      renderCard();
+    };
+    fallbackImg.onerror = () => {
+      loadedImage = null;
+      renderCard();
+    };
+    fallbackImg.src = imgUrl;
+  };
+  img.src = imgUrl;
+}
+
 
 function setShareFormat(fmt, btn) {
   currentFormat = fmt;
@@ -374,11 +526,10 @@ function renderMinimalEditorial(ctx, W, H) {
     }
 
     // Quote Box
-    if (entityData.reviewContent) {
-      currentY += 15;
-      const quoteBoxH = H - currentY - 180;
-      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 260), '#F7F7F9', '#111111', '#FF4433', false);
-    }
+    const fallbackQuote = entityData.reviewContent || entityData.entityDescription || `Explore ratings, insights, and community perspectives on ${entityData.name} on anything...`;
+    currentY += 15;
+    const quoteBoxH = H - currentY - 180;
+    renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 260), '#F7F7F9', '#111111', '#FF4433', false, fallbackQuote);
 
   } else if (currentFormat === 'portrait') {
     // 4:5 Portrait layout
@@ -403,10 +554,9 @@ function renderMinimalEditorial(ctx, W, H) {
       currentY += 45;
     }
 
-    if (entityData.reviewContent) {
-      const quoteBoxH = H - currentY - 150;
-      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 200), '#F7F7F9', '#111111', '#FF4433', false);
-    }
+    const fallbackQuote = entityData.reviewContent || entityData.entityDescription || `Explore ratings, insights, and community perspectives on ${entityData.name} on anything...`;
+    const quoteBoxH = H - currentY - 150;
+    renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 200), '#F7F7F9', '#111111', '#FF4433', false, fallbackQuote);
 
   } else {
     // 1:1 Square layout
@@ -427,10 +577,9 @@ function renderMinimalEditorial(ctx, W, H) {
       currentY += 38;
     }
 
-    if (entityData.reviewContent) {
-      const quoteBoxH = H - currentY - 130;
-      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 150), '#F7F7F9', '#111111', '#FF4433', false);
-    }
+    const fallbackQuote = entityData.reviewContent || entityData.entityDescription || `Explore ratings, insights, and community perspectives on ${entityData.name} on anything...`;
+    const quoteBoxH = H - currentY - 130;
+    renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 150), '#F7F7F9', '#111111', '#FF4433', false, fallbackQuote);
   }
 
   // Footer Signature
@@ -497,7 +646,7 @@ function renderPerspectiveFocus(ctx, W, H) {
   currentY += 40;
 
   // Hero Pull-Quote
-  const quote = entityData.reviewContent ? `“${entityData.reviewContent}”` : `“Exceptional work that demands your attention.”`;
+  const quote = entityData.reviewContent ? `“${entityData.reviewContent}”` : `“${entityData.entityDescription || 'Exceptional ' + entityData.category.toLowerCase() + ' that commands thoughtful attention.'}”`;
   const quoteFontSize = quote.length < 70 ? (currentFormat === 'story' ? 56 : 46) : (currentFormat === 'story' ? 44 : 36);
   ctx.font = `600 ${quoteFontSize}px Georgia, "Times New Roman", serif`;
   ctx.fillStyle = '#FFFDFC';
@@ -684,11 +833,10 @@ function renderAmbientDark(ctx, W, H) {
     }
 
     // Quote Box
-    if (entityData.reviewContent) {
-      currentY += 15;
-      const quoteBoxH = H - currentY - 180;
-      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 260), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true);
-    }
+    const fallbackQuote = entityData.reviewContent || entityData.entityDescription || `A standout ${entityData.category.toLowerCase()} indexed on anything...`;
+    currentY += 15;
+    const quoteBoxH = H - currentY - 180;
+    renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 260), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true, fallbackQuote);
 
   } else if (currentFormat === 'portrait') {
     const imgH = loadedImage ? 440 : 280;
@@ -710,10 +858,9 @@ function renderAmbientDark(ctx, W, H) {
       currentY += 45;
     }
 
-    if (entityData.reviewContent) {
-      const quoteBoxH = H - currentY - 150;
-      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 200), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true);
-    }
+    const fallbackQuote = entityData.reviewContent || entityData.entityDescription || `A standout ${entityData.category.toLowerCase()} indexed on anything...`;
+    const quoteBoxH = H - currentY - 150;
+    renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 200), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true, fallbackQuote);
 
   } else {
     const imgH = loadedImage ? 340 : 200;
@@ -733,10 +880,9 @@ function renderAmbientDark(ctx, W, H) {
       currentY += 38;
     }
 
-    if (entityData.reviewContent) {
-      const quoteBoxH = H - currentY - 130;
-      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 150), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true);
-    }
+    const fallbackQuote = entityData.reviewContent || entityData.entityDescription || `A standout ${entityData.category.toLowerCase()} indexed on anything...`;
+    const quoteBoxH = H - currentY - 130;
+    renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 150), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true, fallbackQuote);
   }
 
   // Footer Signature
@@ -816,7 +962,7 @@ function drawImageAspectFill(ctx, img, x, y, width, height) {
   ctx.drawImage(img, sx, sy, sw, sh, x, y, width, height);
 }
 
-function renderQuoteBox(ctx, x, y, width, height, bgColor, textColor, accentColor, isDark) {
+function renderQuoteBox(ctx, x, y, width, height, bgColor, textColor, accentColor, isDark, customText) {
   // Quote Container Box
   ctx.fillStyle = bgColor;
   drawRoundedRect(ctx, x, y, width, height, 16);
@@ -834,7 +980,8 @@ function renderQuoteBox(ctx, x, y, width, height, bgColor, textColor, accentColo
   ctx.fillText('“', x + 24, y + 16);
 
   // Quote Text
-  const quoteText = `"${entityData.reviewContent}"`;
+  const rawText = customText || entityData.reviewContent || entityData.entityDescription || `Curated perspective on ${entityData.name}.`;
+  const quoteText = rawText.startsWith('“') || rawText.startsWith('"') ? rawText : `"${rawText}"`;
   const textPadX = x + 28;
   const textPadY = y + 74;
   const maxTextW = width - 56;
@@ -862,8 +1009,8 @@ function renderFooter(ctx, W, H, labelColor, handleColor, brandColor, isDark) {
   ctx.font = '800 28px -apple-system, sans-serif';
   ctx.textBaseline = 'middle';
   
-  const handleStr = `@${entityData.author}`;
-  const labelStr = 'Perspective by ';
+  const handleStr = entityData.author ? `@${entityData.author}` : 'anything... Community';
+  const labelStr = entityData.author ? 'Perspective by ' : 'Curated on ';
   
   ctx.fillStyle = labelColor;
   ctx.fillText(labelStr, 70, footerY);
@@ -886,7 +1033,7 @@ function renderFooter(ctx, W, H, labelColor, handleColor, brandColor, isDark) {
 }
 
 /* =========================================================================
-   USER ACTIONS: DOWNLOAD, COPY, NATIVE SHARE
+   USER ACTIONS: DOWNLOAD, COPY, SOCIAL SHARE MODAL, NATIVE SHARE
    ========================================================================= */
 
 function showToast(msg, isError = false) {
@@ -903,89 +1050,257 @@ function showToast(msg, isError = false) {
   }, 4000);
 }
 
-function downloadShareCard() {
+function getCanvasBlobSafe(callback) {
   const canvas = document.getElementById('shareCanvas');
+  if (!canvas) {
+    callback(null);
+    return;
+  }
+
+  // If the loaded image was marked safe or null, try standard export first
+  if (isImageSafe || !loadedImage) {
+    try {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          callback(blob);
+        } else {
+          exportWithoutTaintedImage(callback);
+        }
+      }, 'image/png');
+      return;
+    } catch (err) {
+      console.warn('Canvas export failed, falling back to safe export:', err);
+    }
+  }
+
+  // Fallback: tainted image bypass
+  exportWithoutTaintedImage(callback);
+}
+
+function exportWithoutTaintedImage(callback) {
+  const canvas = document.getElementById('shareCanvas');
+  const tempImg = loadedImage;
+  loadedImage = null; // Temporarily swap out tainted remote image
+  renderCard();
+  
   try {
-    const link = document.createElement('a');
-    const safeTitle = (entityData.name || 'perspective').toLowerCase().replace(/[^a-z0-9]/g, '-');
-    link.download = `anything-${safeTitle}-${currentStyle}-${currentFormat}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    showToast('✨ Card image downloaded successfully!');
-  } catch (err) {
-    console.error('Download failed due to canvas export restrictions:', err);
-    showToast('⚠️ Export issue: saving without remote media.', true);
-    // Fallback: render without remote image and export
-    loadedImage = null;
+    canvas.toBlob((blob) => {
+      loadedImage = tempImg; // Restore preview
+      renderCard();
+      callback(blob);
+    }, 'image/png');
+  } catch (secondErr) {
+    loadedImage = tempImg;
     renderCard();
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.download = `anything-perspective-${currentStyle}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }, 100);
+    console.error('Safe export also failed:', secondErr);
+    callback(null);
   }
 }
 
-async function copyCardToClipboard() {
+function openShareModal() {
+  const modal = document.getElementById('shareModal');
+  if (!modal) return;
+
+  // Render modal preview thumbnail from current canvas
   const canvas = document.getElementById('shareCanvas');
-  const btn = document.getElementById('btnCopyClipboard');
-  const originalText = btn ? btn.innerHTML : '';
+  const thumbImg = document.getElementById('modalPreviewThumb');
+  if (canvas && thumbImg) {
+    try {
+      thumbImg.src = canvas.toDataURL('image/jpeg', 0.6);
+    } catch (e) {
+      thumbImg.src = entityData.imageUrl || '';
+    }
+  }
+
+  // Pre-generate sharing URLs
+  const pageUrl = window.location.href;
+  const entityName = entityData.name || 'Perspective';
+  const scoreText = entityData.ratingScore ? ` (${parseFloat(entityData.ratingScore).toFixed(1)}/5.0★)` : '';
+  const authorText = entityData.author ? ` by @${entityData.author}` : '';
+  const quoteExcerpt = entityData.reviewContent ? ` — "${entityData.reviewContent.slice(0, 90)}..."` : '';
+  const shareText = `Check out this perspective on "${entityName}"${scoreText}${authorText}${quoteExcerpt} on anything...`;
+
+  // WhatsApp
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + '\n' + pageUrl)}`;
+  const waLink = document.getElementById('shareLinkWhatsApp');
+  if (waLink) waLink.href = waUrl;
+
+  // X (Twitter)
+  const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}&hashtags=anything,reviews`;
+  const twLink = document.getElementById('shareLinkTwitter');
+  if (twLink) twLink.href = twUrl;
+
+  // LinkedIn
+  const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`;
+  const liLink = document.getElementById('shareLinkLinkedIn');
+  if (liLink) liLink.href = liUrl;
+
+  // Reddit
+  const rdUrl = `https://reddit.com/submit?url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(`${entityName}${scoreText} — perspective on anything...`)}`;
+  const rdLink = document.getElementById('shareLinkReddit');
+  if (rdLink) rdLink.href = rdUrl;
+
+  // Telegram
+  const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`;
+  const tgLink = document.getElementById('shareLinkTelegram');
+  if (tgLink) tgLink.href = tgUrl;
+
+  // Facebook
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+  const fbLink = document.getElementById('shareLinkFacebook');
+  if (fbLink) fbLink.href = fbUrl;
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShareModal() {
+  const modal = document.getElementById('shareModal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+// Close modal when clicking on outer backdrop
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('shareModal');
+  if (modal && e.target === modal) {
+    closeShareModal();
+  }
+});
+
+async function copyCardUrlToClipboard() {
+  const pageUrl = window.location.href;
+  const icon = document.getElementById('btnModalCopyLinkIcon');
+  const text = document.getElementById('btnModalCopyLinkText');
 
   try {
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        showToast('❌ Failed to create image blob', true);
-        return;
-      }
-      try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(pageUrl);
+    } else {
+      const input = document.createElement('input');
+      input.value = pageUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+    }
+    if (icon) icon.textContent = '✅';
+    if (text) text.textContent = 'Link Copied!';
+    showToast('🔗 Card URL copied to clipboard!');
+    setTimeout(() => {
+      if (icon) icon.textContent = '🔗';
+      if (text) text.textContent = 'Copy Link';
+    }, 2500);
+  } catch (err) {
+    console.error('Copy link failed:', err);
+    showToast('❌ Unable to copy link', true);
+  }
+}
+
+function downloadShareCard() {
+  getCanvasBlobSafe((blob) => {
+    if (blob) {
+      const safeTitle = (entityData.name || 'perspective').toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `anything-${safeTitle}-${currentStyle}-${currentFormat}.png`;
+      link.href = url;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      showToast('✨ Card image downloaded successfully!');
+    } else {
+      showToast('❌ Unable to export card image for download', true);
+    }
+  });
+}
+
+async function copyCardToClipboard() {
+  const btn = document.getElementById('btnCopyClipboard');
+  const modalIcon = document.getElementById('btnModalCopyImgIcon');
+  const modalText = document.getElementById('btnModalCopyImgText');
+  const originalText = btn ? btn.innerHTML : '';
+
+  getCanvasBlobSafe(async (blob) => {
+    if (!blob) {
+      showToast('❌ Failed to create image blob', true);
+      return;
+    }
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.write) {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
         ]);
         if (btn) btn.innerHTML = '<span>✅</span> Copied!';
+        if (modalIcon) modalIcon.textContent = '✅';
+        if (modalText) modalText.textContent = 'Image Copied!';
         showToast('📋 High-res image copied to clipboard!');
         setTimeout(() => {
           if (btn) btn.innerHTML = originalText;
+          if (modalIcon) modalIcon.textContent = '📋';
+          if (modalText) modalText.textContent = 'Copy Image';
         }, 2500);
-      } catch (clipErr) {
-        console.warn('Clipboard write failed, downloading instead', clipErr);
-        downloadShareCard();
+      } else {
+        throw new Error('Clipboard write API not available');
       }
-    }, 'image/png');
-  } catch (err) {
-    console.error('Copy to clipboard failed:', err);
-    downloadShareCard();
-  }
+    } catch (clipErr) {
+      console.warn('Direct clipboard write failed, downloading instead:', clipErr);
+      downloadShareCard();
+      showToast('📥 Image downloaded (browser requires manual file save)', false);
+    }
+  });
+}
+
+function triggerNativeShareFromModal() {
+  getCanvasBlobSafe(async (blob) => {
+    const pageUrl = window.location.href;
+    const safeTitle = (entityData.name || 'Perspective').replace(/[^a-zA-Z0-9 ]/g, '');
+    const titleText = `${entityData.name} on anything...`;
+    const shareText = `Read this perspective on "${entityData.name}" on anything...`;
+
+    if (blob) {
+      const file = new File([blob], `${safeTitle}-perspective.png`, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: titleText,
+            text: shareText,
+            url: pageUrl
+          });
+          closeShareModal();
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          console.warn('Native file share cancelled or failed, falling back to text/URL share:', err);
+        }
+      }
+    }
+
+    // Fallback: share text/URL natively
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: titleText,
+          text: shareText,
+          url: pageUrl
+        });
+        closeShareModal();
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          downloadShareCard();
+        }
+      }
+    } else {
+      downloadShareCard();
+    }
+  });
 }
 
 function nativeWebShare() {
-  const canvas = document.getElementById('shareCanvas');
-  try {
-    canvas.toBlob(blob => {
-      if (!blob) {
-        downloadShareCard();
-        return;
-      }
-      const safeTitle = (entityData.name || 'Perspective').replace(/[^a-zA-Z0-9 ]/g, '');
-      const file = new File([blob], `${safeTitle}-perspective.png`, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          files: [file],
-          title: `${entityData.name} on anything...`,
-          text: `Read this perspective on "${entityData.name}" on anything...`
-        }).catch(err => {
-          if (err.name !== 'AbortError') {
-            downloadShareCard();
-          }
-        });
-      } else {
-        downloadShareCard();
-      }
-    }, 'image/png');
-  } catch (err) {
-    console.warn('Native share failed:', err);
-    downloadShareCard();
-  }
+  openShareModal();
 }
 
 document.addEventListener('DOMContentLoaded', initStudio);
