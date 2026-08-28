@@ -18,10 +18,12 @@ CATEGORIES_DATA = [
     ("Products", "products", "Smartphones, hardware, tools, gadgets, and consumer goods", ""),
     ("Restaurants", "restaurants", "Dining establishments, cafes, bistros, and eateries", ""),
     ("Services", "services", "Streaming services, transit, utilities, and platforms", ""),
+    ("Songs", "songs", "Musical tracks, singles, compositions, and anthems", ""),
     ("Technology", "technology", "Hardware architectures, AI models, paradigms, and innovations", ""),
     ("Websites", "websites", "Online platforms, web services, and internet culture", ""),
     ("Other", "other", "Anything else under the sun that defies singular categorization", ""),
 ]
+
 
 def seed_categories(apps, schema_editor):
     Category = apps.get_model('categories', 'Category')

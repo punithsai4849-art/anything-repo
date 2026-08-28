@@ -118,6 +118,13 @@ const categoryFieldSchemas = {
     { key: 'meta_type', label: 'Emotion / State Type', placeholder: 'e.g. Positive Psychological State' },
     { key: 'meta_related_concepts', label: 'Related Concepts', placeholder: 'e.g. Serenity, Joy, Gratitude' }
   ],
+  songs: [
+    { key: 'meta_artist', label: 'Artist / Performer', placeholder: 'e.g. Queen, The Weeknd, Taylor Swift' },
+    { key: 'meta_album', label: 'Album / EP', placeholder: 'e.g. A Night at the Opera, Starboy' },
+    { key: 'meta_release_year', label: 'Release Year', placeholder: 'e.g. 1975' },
+    { key: 'meta_genre', label: 'Genre', placeholder: 'e.g. Rock, Synth-pop, Classical, Hip-hop' },
+    { key: 'meta_duration', label: 'Duration', placeholder: 'e.g. 5:55' }
+  ],
   health: [
     { key: 'meta_category_type', label: 'Nature', placeholder: 'e.g. Psychological / Physical / Lifestyle' },
     { key: 'meta_helpful_practices', label: 'Beneficial Practices', placeholder: 'e.g. Mindfulness, Sleep hygiene' }
@@ -127,6 +134,7 @@ const categoryFieldSchemas = {
     { key: 'meta_attribute_2', label: 'Key Property 2', placeholder: 'e.g. Year / Classification' }
   ]
 };
+
 
 function updateDynamicMetadataFields(catSlug) {
   const container = document.getElementById('dynamicFieldsInputs');

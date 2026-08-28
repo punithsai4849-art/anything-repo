@@ -53,15 +53,16 @@ class Command(BaseCommand):
             ("Products", "products", "Smartphones, hardware, tools, gadgets, and consumer goods", ""),
             ("Restaurants", "restaurants", "Dining establishments, cafes, bistros, and eateries", ""),
             ("Services", "services", "Streaming services, transit, utilities, and platforms", ""),
+            ("Songs", "songs", "Musical tracks, singles, compositions, and anthems", ""),
             ("Technology", "technology", "Hardware architectures, AI models, paradigms, and innovations", ""),
             ("Websites", "websites", "Online platforms, web services, and internet culture", ""),
             ("Other", "other", "Anything else under the sun that defies singular categorization", ""),
         ]
 
-
         cat_map = {}
         for name, slug, desc, icon in categories_data:
             c, _ = Category.objects.get_or_create(
+
                 slug=slug,
                 defaults={'name': name, 'description': desc, 'icon': icon}
             )
@@ -766,8 +767,48 @@ class Command(BaseCommand):
                 'reviews': [
                     ('marcus_tech', 4.5, 'The home of modern software development', 'Pull requests, CI/CD Actions, and open-source collaboration made programming global.')
                 ]
+            },
+
+            # 🎵 SONGS
+            {
+                'name': 'Bohemian Rhapsody',
+                'category': 'songs',
+                'description': 'A progressive rock suite by British rock band Queen, written by Freddie Mercury and renowned for its multi-part structure without a refraining chorus.',
+                'image_url': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
+                'tags': ['music', 'rock', 'queen', 'classics'],
+                'metadata': {'artist': 'Queen', 'album': 'A Night at the Opera', 'release_year': 1975, 'genre': 'Progressive Rock', 'duration': '5:55'},
+                'scores': [5.0, 5.0, 5.0, 4.5, 5.0],  # Avg 4.9
+                'reviews': [
+                    ('claire_cinema', 5.0, 'An operatic masterpiece', 'Freddie Mercury\'s vocal layers and Brian May\'s guitar solo create one of the greatest recorded tracks in human history.'),
+                    ('alex_reviewer', 5.0, 'Timeless rock symphony', 'Seamlessly traverses ballad, mock-opera, hard rock, and reflective coda with breathtaking audacity.')
+                ]
+            },
+            {
+                'name': 'Blinding Lights',
+                'category': 'songs',
+                'description': 'An upbeat synthwave and pop track by Canadian singer The Weeknd, which became Billboard\'s all-time #1 Hot 100 song.',
+                'image_url': 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80',
+                'tags': ['music', 'pop', 'synthwave', 'the-weeknd'],
+                'metadata': {'artist': 'The Weeknd', 'album': 'After Hours', 'release_year': 2019, 'genre': 'Synth-pop / Synthwave', 'duration': '3:20'},
+                'scores': [5.0, 4.5, 4.5, 4.0, 4.5],  # Avg 4.5
+                'reviews': [
+                    ('maya_explorer', 4.5, 'Irresistible retro-futuristic energy', 'The 80s drum machines and soaring melodies make it impossible not to move.')
+                ]
+            },
+            {
+                'name': 'Hotel California',
+                'category': 'songs',
+                'description': 'The title track of the Eagles\' 1976 album, known for its intricate guitar harmonies, surrealist lyrics, and Don Felder and Joe Walsh\'s dual guitar solo.',
+                'image_url': 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80',
+                'tags': ['music', 'rock', 'eagles', '70s'],
+                'metadata': {'artist': 'Eagles', 'album': 'Hotel California', 'release_year': 1976, 'genre': 'Soft Rock / Classic Rock', 'duration': '6:30'},
+                'scores': [5.0, 5.0, 4.5, 4.5],  # Avg 4.75
+                'reviews': [
+                    ('sophia_reads', 5.0, 'Poetic storytelling and legendary guitar work', 'The layered guitars and haunting metaphorical lyrics create an unmatched atmosphere.')
+                ]
             }
         ]
+
 
         # 4. Populate Entities & Ratings
         created_entities = {}
