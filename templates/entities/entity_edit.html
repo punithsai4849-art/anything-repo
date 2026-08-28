@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit {{ entity.name }} — anything...{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 3rem; padding-bottom: 4rem;">
+  
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.5rem;">
+      Contribute to {{ entity.name }}
+    </h1>
+    <p class="text-lead" style="max-width: 600px; margin: 0 auto;">
+      Improve information, add missing details, or update tags for the community.
+    </p>
+  </div>
+
+  <form action="{% url 'entity_edit' entity.slug %}" method="POST" enctype="multipart/form-data" style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem;">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Entity Name</label>
+      <input type="text" name="name" value="{{ entity.name }}" class="form-control" required style="font-size: 1.1rem;">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description / Synopsis</label>
+      <textarea name="description" class="form-control" rows="5">{{ entity.description }}</textarea>
+    </div>
+
+    <!-- Existing & Editable Metadata Fields -->
+    <div style="background: var(--bg-subtle); border: 2px solid #111; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.75rem;">
+      <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem;">{{ entity.category.name }} Metadata Properties</h4>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        {% for key, val in entity.metadata.items %}
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-size: 0.85rem;">{{ key|cut:"_" }}</label>
+          <input type="text" name="meta_{{ key }}" value="{{ val }}" class="form-control">
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tags (comma-separated)</label>
+      <input type="text" name="tags" value="{{ existing_tags }}" class="form-control" placeholder="e.g. sci-fi, apple, travel">
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label class="form-label">Primary Image URL</label>
+        <input type="url" name="primary_image_url" value="{{ entity.primary_image_url }}" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Or Upload New Image</label>
+        <input type="file" name="primary_image" accept="image/*" class="form-control">
+      </div>
+    </div>
+
+    <!-- Reason for Edit (Audit History) -->
+    <div class="form-group" style="border-top: 1.5px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
+      <label class="form-label">Reason for this edit (Recorded in contribution history) *</label>
+      <input type="text" name="reason" class="form-control" placeholder="e.g. Added director information, corrected release year, expanded description..." required>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+      <a href="{% url 'entity_detail' entity.slug %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-lg" style="box-shadow: var(--shadow-brutal-md);">
+        Save Community Contribution
+      </button>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

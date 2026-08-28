@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load entity_tags %}
+
+{% block title %}{{ entity.name }} ({{ entity.category.name }}) — anything...{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 4.5rem;">
+
+  <!-- Entity Hero Bento Spotlight -->
+  <div class="bento-card bento-card-glass" style="margin-bottom: 2.5rem; padding: 2.5rem;">
+    <div style="display: grid; grid-template-columns: auto 1fr; gap: 2.5rem; align-items: start;">
+      
+      <!-- Entity Primary Media / Abstract Graphic -->
+      <div style="width: 220px; aspect-ratio: 4/5; border-radius: var(--radius-lg); overflow: hidden; background: #1a1a1a; border: 2.5px solid #111; box-shadow: var(--shadow-brutal-md); flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative;">
+        {% if entity.image_display_url %}
+          <img src="{{ entity.image_display_url }}" alt="{{ entity.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+        {% else %}
+          <div style="padding: 1.5rem; text-align: center; color: #fff;">
+            <div style="font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.75);">{{ entity.category.name }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Entity Details & Metadata -->
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+          <a href="{% url 'entity_list' %}?category={{ entity.category.slug }}" class="badge badge-primary" style="font-size: 0.9rem; padding: 0.4rem 0.85rem; text-decoration: none;">
+            {{ entity.category.name }}
+          </a>
+          
+          {% if entity.average_rating %}
+          <div style="display: flex; align-items: center; gap: 0.35rem; font-weight: 900; font-size: 1.15rem; color: var(--cineast-primary);">
+            <svg width="20" height="20" fill="var(--cineast-primary)" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            {{ entity.average_rating }} / 5.0
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">({{ entity.ratings_count }} rating{{ entity.ratings_count|pluralize }})</span>
+          </div>
+          {% else %}
+          <span style="color: var(--text-muted); font-size: 0.9rem;">No ratings yet</span>
+          {% endif %}
+        </div>
+
+        <h1 style="font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 1rem; line-height: 1.1;">
+          {{ entity.name }}
+        </h1>
+
+        <p style="font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 800px;">
+          {{ entity.description|default:"No description provided yet." }}
+        </p>
+
+        <!-- Tags -->
+        {% if entity.tags.all %}
+        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.75rem;">
+          {% for tag in entity.tags.all %}
+          <a href="{% url 'entity_list' %}?tag={{ tag.slug }}" class="badge badge-subtle" style="text-decoration: none; font-size: 0.85rem;">
+            #{{ tag.name }}
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Interactive Action Bar -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+          {% if user.is_authenticated %}
+            <button type="button" class="btn btn-primary" onclick="openRatingModal()">
+              {% if user_rating %}Rated {{ user_rating.score }}★{% else %}Rate{% endif %}
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="openReviewModal()">
+              {% if user_review %}Edit Review{% else %}Write Review{% endif %}
+            </button>
+            <a href="{% url 'entity_edit' entity.slug %}" class="btn btn-secondary">
+              Edit Info
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">
+              Sign In to Rate & Review
+            </a>
+          {% endif %}
+          
+          <button type="button" class="btn btn-ghost btn-sm" onclick="openReportModal('entity', '{{ entity.id }}')">
+            Report
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bento Grid Metadata & Insights Dashboard -->
+  {% if entity.metadata or entity.outgoing_relationships.all or entity.incoming_relationships.all %}
+  <section style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.35rem; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 1.25rem;">
+      {{ entity.category.name }} Insights & Properties
+    </h2>
+
+    <div class="bento-grid">
+      
+      <!-- Metadata Properties as Bento Cards -->
+      {% for key, val in entity.metadata.items %}
+      <div class="bento-card bento-col-3 bento-card-subtle" style="min-height: 120px; padding: 1.25rem;">
+        <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+          {{ key|cut:"_" }}
+        </div>
+        <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-primary); line-height: 1.3;">
+          {{ val }}
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Relationships Bento Tile -->
+      {% if entity.outgoing_relationships.all or entity.incoming_relationships.all %}
+      <div class="bento-card bento-col-6 bento-card-glass" style="padding: 1.5rem;">
+        <div class="bento-header">
+          <span class="bento-badge">Relationships</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Direct Links</span>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+          {% for rel in entity.outgoing_relationships.all %}
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: #fff; border: 1.5px solid #111; border-radius: var(--radius-sm);">
+            <div>
+              <span style="font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted);">{{ rel.get_relationship_type_display }}</span>
+              <div>
+                <a href="{% url 'entity_detail' rel.target_entity.slug %}" style="font-weight: 800; color: var(--text-primary); text-decoration: none;">
+                  {{ rel.target_entity.name }}
+                </a>
+              </div>
+            </div>
+            <span class="badge badge-subtle">{{ rel.target_entity.category.name }}</span>
+          </div>
+          {% endfor %}
+
+          {% for rel in entity.incoming_relationships.all %}
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: #fff; border: 1.5px solid #111; border-radius: var(--radius-sm);">
+            <div>
+              <div>
+                <a href="{% url 'entity_detail' rel.source_entity.slug %}" style="font-weight: 800; color: var(--text-primary); text-decoration: none;">
+                  {{ rel.source_entity.name }}
+                </a>
+              </div>
+              <span style="font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted);">{{ rel.get_relationship_type_display }} this</span>
+            </div>
+            <span class="badge badge-subtle">{{ rel.source_entity.category.name }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Reviews & Contribution History -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; margin-bottom: 3rem;">
+    
+    <!-- Left Column: Community Reviews -->
+    <div>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em;">
+          Community Perspectives ({{ entity.reviews_count }})
+        </h2>
+        {% if user.is_authenticated and not user_review %}
+        <button type="button" class="btn btn-primary btn-sm" onclick="openReviewModal()">+ Write Perspective</button>
+        {% endif %}
+      </div>
+
+      {% if reviews %}
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for rev in reviews %}
+        <div class="bento-card" style="padding: 1.75rem; background: #fff;">
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="avatar-circle" style="width: 38px; height: 38px; border: 1.5px solid #111;">
+                {% if rev.user.profile.avatar %}
+                  <img src="{{ rev.user.profile.avatar.url }}" alt="{{ rev.user.username }}">
+                {% else %}
+                  {{ rev.user.username|slice:":1"|upper }}
+                {% endif %}
+              </div>
+              <div>
+                <a href="{% url 'user_profile' rev.user.username %}" style="font-weight: 800; color: var(--text-primary); text-decoration: none; font-size: 1rem;">
+                  @{{ rev.user.username }}
+                </a>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ rev.created_at|date:"M d, Y" }}</div>
+              </div>
+            </div>
+
+            {% if rev.rating %}
+            <div style="display: flex; align-items: center; gap: 0.25rem; font-weight: 800; font-size: 1rem; color: var(--cineast-primary); background: #fff; border: 1.5px solid #111; padding: 0.25rem 0.6rem; border-radius: var(--radius-full); box-shadow: 1.5px 1.5px 0px #111;">
+              ★ {{ rev.rating.score }}
+            </div>
+            {% endif %}
+          </div>
+
+          {% if rev.title %}
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">"{{ rev.title }}"</h3>
+          {% endif %}
+
+          <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1.25rem; white-space: pre-line;">
+            {{ rev.content }}
+          </p>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+            <a href="{% url 'share_review_card' rev.id %}" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+              Generate Share Card
+            </a>
+
+            <div style="display: flex; gap: 0.5rem;">
+              {% if rev.user == user or user.is_staff %}
+              <form action="{% url 'delete_review' rev.id %}" method="POST" onsubmit="return confirm('Delete this review?');" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--cineast-primary); font-size: 0.8rem;">Delete</button>
+              </form>
+              {% endif %}
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openReportModal('review', '{{ rev.id }}')" style="font-size: 0.8rem;">
+                Report
+              </button>
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 3rem 1rem; background: var(--bg-subtle); border: 2px solid #111; border-radius: var(--radius-lg);">
+        <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">No reviews yet</div>
+        <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.25rem;">Share your perspective and evaluation on {{ entity.name }}.</p>
+        {% if user.is_authenticated %}
+        <button type="button" class="btn btn-primary btn-sm" onclick="openReviewModal()">Write the First Review</button>
+        {% else %}
+        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Sign In to Review</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Contribution History -->
+      {% if contributions %}
+      <section style="margin-top: 3rem;">
+        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">
+          Community Contribution Log
+        </h3>
+        <div style="background: var(--bg-card); border: 2px solid #111; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-brutal-sm);">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+            <thead>
+              <tr style="background: var(--bg-subtle); border-bottom: 2px solid #111; text-align: left;">
+                <th style="padding: 0.6rem 1rem;">Field</th>
+                <th style="padding: 0.6rem 1rem;">Editor</th>
+                <th style="padding: 0.6rem 1rem;">Reason / Change</th>
+                <th style="padding: 0.6rem 1rem;">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for edit in contributions %}
+              <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 0.6rem 1rem; font-weight: 700;">{{ edit.field_name }}</td>
+                <td style="padding: 0.6rem 1rem;">@{{ edit.edited_by.username|default:"Anonymous" }}</td>
+                <td style="padding: 0.6rem 1rem; color: var(--text-secondary);">{{ edit.reason|default:"Updated information" }}</td>
+                <td style="padding: 0.6rem 1rem; color: var(--text-muted);">{{ edit.created_at|date:"M d, Y" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+    </div>
+
+    <!-- Right Column: Related in Category -->
+    <div>
+      {% if related_entities %}
+      <div class="bento-card" style="padding: 1.5rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">More in {{ entity.category.name }}</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          {% for rel_e in related_entities %}
+          <a href="{% url 'entity_detail' rel_e.slug %}" style="display: flex; gap: 0.75rem; align-items: center; text-decoration: none; color: inherit; padding: 0.5rem; border-radius: var(--radius-md); transition: background var(--transition-fast);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); overflow: hidden; background: #1a1a1a; border: 1.5px solid #111; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+              {% if rel_e.image_display_url %}
+              <img src="{{ rel_e.image_display_url }}" alt="{{ rel_e.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              {% else %}
+              <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">{{ rel_e.category.name|slice:":2"|upper }}</span>
+              {% endif %}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ rel_e.name }}</div>
+              {% if rel_e.average_rating %}
+              <div style="font-size: 0.8rem; color: var(--cineast-primary); font-weight: 700;">★ {{ rel_e.average_rating }}</div>
+              {% endif %}
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Rating Modal Dialog -->
+<div id="ratingModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2rem; width: 90%; max-width: 420px; text-align: center;">
+    <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem;">Rate {{ entity.name }}</h3>
+    <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Select your rating from 0.5 to 5.0</p>
+    
+    <form action="{% url 'rate_entity' entity.id %}" method="POST">
+      {% csrf_token %}
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+        {% for score_val in "0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0"|make_list_split:"," %}
+        <label style="cursor: pointer;">
+          <input type="radio" name="score" value="{{ score_val }}" {% if user_rating and user_rating.score|stringformat:".1f" == score_val %}checked{% endif %} style="display: none;" onchange="this.parentElement.style.background='var(--cineast-primary)';">
+          <div class="rating-choice-btn" style="border: 1.5px solid #111; padding: 0.5rem 0.25rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.9rem; background: #fff; box-shadow: 1.5px 1.5px 0px #111;">
+            {{ score_val }}★
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+      
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button type="button" class="btn btn-secondary" onclick="closeRatingModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Rating</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Review Modal Dialog -->
+<div id="reviewModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2rem; width: 90%; max-width: 550px;">
+    <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem;">Review {{ entity.name }}</h3>
+    <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Share your evaluation, perspective, or thoughts</p>
+    
+    <form action="{% url 'create_review' entity.id %}" method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Review Headline (Optional)</label>
+        <input type="text" name="title" value="{{ user_review.title|default:'' }}" class="form-control" placeholder="e.g. A singular achievement / Worth checking out">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rating</label>
+        <select name="score" class="form-control">
+          <option value="">No rating attached</option>
+          {% for score_val in "5.0,4.5,4.0,3.5,3.0,2.5,2.0,1.5,1.0,0.5"|make_list_split:"," %}
+          <option value="{{ score_val }}" {% if user_review.rating and user_review.rating.score|stringformat:".1f" == score_val %}selected{% elif user_rating and user_rating.score|stringformat:".1f" == score_val %}selected{% endif %}>
+            {{ score_val }} Stars
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Review Content *</label>
+        <textarea name="content" class="form-control" rows="5" required placeholder="Write your honest review, experience, and insights...">{{ user_review.content|default:'' }}</textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeReviewModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Publish Review</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Report Modal Dialog -->
+<div id="reportModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2rem; width: 90%; max-width: 450px;">
+    <h3 style="font-size: 1.35rem; font-weight: 900; margin-bottom: 0.5rem;">Report Content</h3>
+    <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 1.25rem;">Help keep anything... constructive, safe, and accurate.</p>
+    
+    <form action="{% url 'report_content' %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="content_type" id="reportContentType" value="entity">
+      <input type="hidden" name="content_id" id="reportContentId" value="{{ entity.id }}">
+      <input type="hidden" name="next" value="{{ request.path }}">
+      
+      <div class="form-group">
+        <label class="form-label">Reason</label>
+        <select name="reason" class="form-control">
+          <option value="spam">Spam / Advertising</option>
+          <option value="harassment">Harassment / Hate speech</option>
+          <option value="misinformation">Misinformation / Fabricated</option>
+          <option value="personal_info">Private personal information (Doxxing)</option>
+          <option value="abuse">Abuse / Inappropriate content</option>
+          <option value="other">Other issue</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Additional Details (Optional)</label>
+        <textarea name="details" class="form-control" rows="3" placeholder="Explain the issue for moderators..."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openRatingModal() { document.getElementById('ratingModal').style.display = 'flex'; }
+function closeRatingModal() { document.getElementById('ratingModal').style.display = 'none'; }
+function openReviewModal() { document.getElementById('reviewModal').style.display = 'flex'; }
+function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
+
+function openReportModal(cType, cId) {
+  document.getElementById('reportContentType').value = cType;
+  document.getElementById('reportContentId').value = cId;
+  document.getElementById('reportModal').style.display = 'flex';
+}
+function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
+</script>
+{% endblock %}

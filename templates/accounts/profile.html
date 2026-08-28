@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}@{{ profile_user.username }} — anything...{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+  
+  <!-- Profile Header Card -->
+  <div style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem; margin-bottom: 3rem;">
+    <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+      
+      <div class="avatar-circle" style="width: 90px; height: 90px; font-size: 2.25rem; border: 2.5px solid #111; box-shadow: var(--shadow-brutal-sm);">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">
+        {% else %}
+          {{ profile_user.username|slice:":1"|upper }}
+        {% endif %}
+      </div>
+
+      <div style="flex: 1; min-width: 260px;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+          <h1 style="font-size: 2.25rem; font-weight: 900; letter-spacing: -0.03em;">@{{ profile_user.username }}</h1>
+          {% if profile_user == user %}
+          <a href="{% url 'edit_profile' %}" class="btn btn-secondary btn-sm">Edit Profile</a>
+          {% endif %}
+        </div>
+        
+        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          {{ profile.bio|default:"No bio provided yet." }}
+        </p>
+
+        <!-- Stats Counter Row -->
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+          <div style="border-left: 3px solid var(--cineast-primary); padding-left: 0.75rem;">
+            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.entities_rated_count }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Rated</div>
+          </div>
+          <div style="border-left: 3px solid #111; padding-left: 0.75rem;">
+            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.reviews_count }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Perspectives</div>
+          </div>
+          <div style="border-left: 3px solid #111; padding-left: 0.75rem;">
+            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.entities_created_count }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Created</div>
+          </div>
+          <div style="border-left: 3px solid #111; padding-left: 0.75rem;">
+            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.contributions_count }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Edits</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Perspectives / Reviews Section -->
+  <section style="margin-bottom: 3.5rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.02em;">
+      Perspectives ({{ profile.reviews_count }})
+    </h2>
+
+    {% if reviews %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for rev in reviews %}
+      <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-lg); box-shadow: var(--shadow-brutal-md); padding: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <a href="{% url 'entity_detail' rev.entity.slug %}" style="font-weight: 900; font-size: 1.2rem; color: var(--text-primary); text-decoration: none;">
+            {{ rev.entity.name }}
+          </a>
+          <span class="badge badge-subtle">{{ rev.entity.category.name }}</span>
+        </div>
+
+        {% if rev.rating %}
+        <div style="display: flex; align-items: center; gap: 0.25rem; font-weight: 800; font-size: 0.95rem; color: var(--cineast-primary); margin-bottom: 0.5rem;">
+          ★ {{ rev.rating.score }} / 5.0
+        </div>
+        {% endif %}
+
+        {% if rev.title %}
+        <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem;">"{{ rev.title }}"</h4>
+        {% endif %}
+
+        <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+          {{ rev.content }}
+        </p>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.5rem;">
+          <span style="font-size: 0.8rem; color: var(--text-muted);">{{ rev.created_at|date:"M d, Y" }}</span>
+          <a href="{% url 'share_review_card' rev.id %}" class="btn btn-ghost btn-sm" style="font-size: 0.8rem;">
+            Generate Share Card →
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-secondary">No reviews published yet.</p>
+    {% endif %}
+  </section>
+
+  <!-- Ratings Section -->
+  <section style="margin-bottom: 3.5rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.02em;">
+      Recent Ratings
+    </h2>
+
+    {% if ratings %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+      {% for r in ratings %}
+      <a href="{% url 'entity_detail' r.entity.slug %}" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-card); border: 2px solid #111; border-radius: var(--radius-md); box-shadow: var(--shadow-brutal-sm); text-decoration: none; color: inherit;">
+        <div>
+          <div style="font-weight: 800; font-size: 0.95rem;">{{ r.entity.name }}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">{{ r.entity.category.name }}</div>
+        </div>
+        <div style="font-weight: 900; font-size: 1.1rem; color: var(--cineast-primary);">
+          ★ {{ r.score }}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-secondary">No ratings yet.</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

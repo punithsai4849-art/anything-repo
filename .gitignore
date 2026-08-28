@@ -1,0 +1,23 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python bytecode and virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Django media and staticfiles collection
+media/
+staticfiles/
+*.sqlite3
+
+# Operating System & IDE files
+.DS_Store
+.vscode/
+.idea/
+*.log

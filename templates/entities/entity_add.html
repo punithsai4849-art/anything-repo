@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Anything — anything...{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding-top: 3rem; padding-bottom: 4rem;">
+  
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.75rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.5rem;">
+      Add <span style="color: var(--cineast-primary);">anything...</span>
+    </h1>
+    <p class="text-lead" style="max-width: 600px; margin: 0 auto;">
+      Create an entry for any film, gadget, destination, book, emotion, theory, or tool.
+    </p>
+  </div>
+
+  <form action="{% url 'entity_add' %}" method="POST" enctype="multipart/form-data" style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem;">
+    {% csrf_token %}
+
+    <!-- 1. Category Selection -->
+    <div class="form-group" style="margin-bottom: 2rem;">
+      <label class="form-label" style="font-size: 1.05rem;">1. Select Category *</label>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+        {% for cat in categories %}
+        <label class="category-radio-card" style="cursor: pointer;">
+          <input type="radio" name="category_id" value="{{ cat.id }}" {% if forloop.first %}checked{% endif %} onchange="updateDynamicMetadataFields('{{ cat.slug }}')" style="display: none;">
+          <div class="cat-pill" style="border: 2px solid #111; padding: 0.65rem 0.5rem; border-radius: var(--radius-md); text-align: center; background: #fff; box-shadow: 2px 2px 0px #111; transition: all var(--transition-fast);">
+            <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-primary);">{{ cat.name }}</div>
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+
+    <!-- 2. Name & Description -->
+    <div class="form-group">
+      <label class="form-label">2. Entity Name *</label>
+      <input type="text" name="name" class="form-control" placeholder="e.g. Interstellar, iPhone 16 Pro, Hyderabad, Nostalgia..." required style="font-size: 1.1rem;">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description / Synopsis</label>
+      <textarea name="description" class="form-control" rows="4" placeholder="Overview, summary, premise, or definition..."></textarea>
+    </div>
+
+    <!-- 3. Category-Specific Dynamic Fields -->
+    <div id="dynamicFieldsContainer" style="margin-bottom: 1.75rem; background: var(--bg-subtle); border: 2px solid #111; border-radius: var(--radius-lg); padding: 1.5rem;">
+      <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem;" id="dynamicFieldsTitle">Category Details</h4>
+      
+      <div id="dynamicFieldsInputs" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <!-- Injected via JavaScript based on selected category -->
+      </div>
+    </div>
+
+    <!-- 4. Tags -->
+    <div class="form-group">
+      <label class="form-label">Tags (comma-separated)</label>
+      <input type="text" name="tags" class="form-control" placeholder="e.g. sci-fi, apple, travel, psychology, food">
+    </div>
+
+    <!-- 5. Visual Media (Optional) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label class="form-label">Primary Image URL (Optional)</label>
+        <input type="url" name="primary_image_url" class="form-control" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Or Upload Image File</label>
+        <input type="file" name="primary_image" accept="image/*" class="form-control">
+      </div>
+    </div>
+
+    <!-- Submit Action -->
+    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+      <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-lg" style="box-shadow: var(--shadow-brutal-md);">
+        Publish to anything...
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+const categoryFieldSchemas = {
+  movies: [
+    { key: 'meta_release_year', label: 'Release Year', placeholder: 'e.g. 2024' },
+    { key: 'meta_runtime', label: 'Runtime', placeholder: 'e.g. 169 min' },
+    { key: 'meta_director', label: 'Director', placeholder: 'e.g. Christopher Nolan' },
+    { key: 'meta_language', label: 'Original Language', placeholder: 'e.g. English' }
+  ],
+  products: [
+    { key: 'meta_brand', label: 'Brand / Manufacturer', placeholder: 'e.g. Apple, Sony, Teenage Engineering' },
+    { key: 'meta_model', label: 'Model', placeholder: 'e.g. 16 Pro' },
+    { key: 'meta_release_year', label: 'Release Year', placeholder: 'e.g. 2024' },
+    { key: 'meta_price_tier', label: 'Price Range', placeholder: 'e.g. Flagship / Budget' }
+  ],
+  books: [
+    { key: 'meta_author', label: 'Author', placeholder: 'e.g. Haruki Murakami' },
+    { key: 'meta_published_year', label: 'Published Year', placeholder: 'e.g. 2002' },
+    { key: 'meta_pages', label: 'Page Count', placeholder: 'e.g. 505' },
+    { key: 'meta_isbn', label: 'ISBN', placeholder: 'e.g. 978-0307474278' }
+  ],
+  places: [
+    { key: 'meta_city', label: 'City', placeholder: 'e.g. Hyderabad' },
+    { key: 'meta_country', label: 'Country', placeholder: 'e.g. India' },
+    { key: 'meta_famous_for', label: 'Famous For', placeholder: 'e.g. Historic monuments, Biryani, Tech' }
+  ],
+  apps: [
+    { key: 'meta_developer', label: 'Developer / Studio', placeholder: 'e.g. Spotify AB' },
+    { key: 'meta_platforms', label: 'Platforms', placeholder: 'e.g. iOS, Android, macOS, Web' },
+    { key: 'meta_pricing', label: 'Pricing Model', placeholder: 'e.g. Freemium / Subscription' }
+  ],
+  feelings: [
+    { key: 'meta_type', label: 'Emotion / State Type', placeholder: 'e.g. Positive Psychological State' },
+    { key: 'meta_related_concepts', label: 'Related Concepts', placeholder: 'e.g. Serenity, Joy, Gratitude' }
+  ],
+  health: [
+    { key: 'meta_category_type', label: 'Nature', placeholder: 'e.g. Psychological / Physical / Lifestyle' },
+    { key: 'meta_helpful_practices', label: 'Beneficial Practices', placeholder: 'e.g. Mindfulness, Sleep hygiene' }
+  ],
+  default: [
+    { key: 'meta_attribute_1', label: 'Key Property 1', placeholder: 'e.g. Origin / Creator' },
+    { key: 'meta_attribute_2', label: 'Key Property 2', placeholder: 'e.g. Year / Classification' }
+  ]
+};
+
+function updateDynamicMetadataFields(catSlug) {
+  const container = document.getElementById('dynamicFieldsInputs');
+  const title = document.getElementById('dynamicFieldsTitle');
+  const fields = categoryFieldSchemas[catSlug] || categoryFieldSchemas['default'];
+  
+  title.textContent = `${catSlug.charAt(0).toUpperCase() + catSlug.slice(1)} Specific Details`;
+  container.innerHTML = fields.map(f => `
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="form-label" style="font-size: 0.85rem;">${f.label}</label>
+      <input type="text" name="${f.key}" class="form-control" placeholder="${f.placeholder}">
+    </div>
+  `).join('');
+
+  // Style active radio card
+  document.querySelectorAll('.cat-pill').forEach(el => {
+    el.style.background = '#fff';
+    el.style.borderColor = '#111';
+    el.style.color = 'inherit';
+  });
+  const checked = document.querySelector('input[name="category_id"]:checked');
+  if (checked) {
+    const pill = checked.parentElement.querySelector('.cat-pill');
+    pill.style.background = 'var(--cineast-primary)';
+    pill.style.color = '#fff';
+  }
+}
+
+// Initial trigger
+document.addEventListener('DOMContentLoaded', () => {
+  const firstChecked = document.querySelector('input[name="category_id"]:checked');
+  if (firstChecked) {
+    updateDynamicMetadataFields('movies');
+  }
+});
+</script>
+{% endblock %}

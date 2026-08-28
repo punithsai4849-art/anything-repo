@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Share Perspective — {{ entity.name }} — anything...{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+  
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <a href="{% url 'entity_detail' entity.slug %}" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem;">
+      ← Back to {{ entity.name }}
+    </a>
+    <h1 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em;">
+      Social Share Card Studio
+    </h1>
+    <p class="text-lead" style="max-width: 550px; margin: 0 auto;">
+      Create a shareable visual card for your review and opinion.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 3rem; align-items: start; max-width: 1050px; margin: 0 auto;">
+    
+    <!-- Controls Column -->
+    <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-md); padding: 2rem;">
+      
+      <!-- Format Picker -->
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label" style="font-size: 0.95rem;">1. Aspect Ratio Format</label>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+          <button type="button" class="btn btn-secondary format-btn active" onclick="setShareFormat('story', this)" id="btnFmtStory">
+            Story<br><small style="font-size: 0.75rem; opacity: 0.75;">9:16 (1080×1920)</small>
+          </button>
+          <button type="button" class="btn btn-secondary format-btn" onclick="setShareFormat('portrait', this)" id="btnFmtPortrait">
+            Portrait<br><small style="font-size: 0.75rem; opacity: 0.75;">4:5 (1080×1350)</small>
+          </button>
+          <button type="button" class="btn btn-secondary format-btn" onclick="setShareFormat('square', this)" id="btnFmtSquare">
+            Square<br><small style="font-size: 0.75rem; opacity: 0.75;">1:1 (1080×1080)</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editorial Template Theme -->
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label" style="font-size: 0.95rem;">2. Visual Style Template</label>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+          <button type="button" class="btn btn-secondary style-btn active" onclick="setShareStyle('minimal', this)" style="text-align: left; justify-content: flex-start;">
+            <strong>Minimal Editorial</strong> (Clean white surface, bold typography)
+          </button>
+          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('quote', this)" style="text-align: left; justify-content: flex-start;">
+            <strong>Perspective Focus</strong> (Prominent pull-quote & star rating)
+          </button>
+          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('dark', this)" style="text-align: left; justify-content: flex-start;">
+            <strong>Ambient Dark</strong> (Frosted dark canvas with #FF4433 accent)
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
+        <button type="button" class="btn btn-primary btn-lg" onclick="downloadShareCard()" style="box-shadow: var(--shadow-brutal-md);">
+          Download High-Res PNG
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="nativeWebShare()" id="btnWebShare">
+          Native Share
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Live Canvas Studio Preview Column -->
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.75rem;">
+        Live Render Preview
+      </div>
+      
+      <div style="background: #e8e8e8; border: 2.5px solid #111; border-radius: var(--radius-lg); box-shadow: var(--shadow-brutal-lg); padding: 1rem; max-width: 100%; display: flex; justify-content: center; overflow: hidden;">
+        <canvas id="shareCanvas" width="1080" height="1920" style="max-width: 100%; max-height: 520px; width: auto; height: auto; border-radius: 8px; border: 1.5px solid #222; background: #fff;"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let currentFormat = 'story'; // 'story' (1080x1920), 'portrait' (1080x1350), 'square' (1080x1080)
+let currentStyle = 'minimal'; // 'minimal', 'quote', 'dark'
+
+const entityData = {
+  name: `{{ entity.name|escapejs }}`,
+  category: `{{ category.name|escapejs }}`,
+  imageUrl: `{{ entity.image_display_url|default:''|escapejs }}`,
+  reviewTitle: `{{ review.title|default:''|escapejs }}`,
+  reviewContent: `{{ review.content|escapejs }}`,
+  ratingScore: `{{ rating.score|default:'' }}`,
+  author: `{{ author.username|escapejs }}`
+};
+
+let loadedImage = null;
+
+function initStudio() {
+  if (entityData.imageUrl) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      loadedImage = img;
+      renderCard();
+    };
+    img.onerror = () => {
+      loadedImage = null;
+      renderCard();
+    };
+    img.src = entityData.imageUrl;
+  } else {
+    renderCard();
+  }
+}
+
+function setShareFormat(fmt, btn) {
+  currentFormat = fmt;
+  document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const canvas = document.getElementById('shareCanvas');
+  if (fmt === 'story') {
+    canvas.width = 1080; canvas.height = 1920;
+  } else if (fmt === 'portrait') {
+    canvas.width = 1080; canvas.height = 1350;
+  } else if (fmt === 'square') {
+    canvas.width = 1080; canvas.height = 1080;
+  }
+  renderCard();
+}
+
+function setShareStyle(styleName, btn) {
+  currentStyle = styleName;
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCard();
+}
+
+function renderCard() {
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Background
+  if (currentStyle === 'dark') {
+    ctx.fillStyle = '#0F0F11';
+    ctx.fillRect(0, 0, W, H);
+    // Subtle gradient glow
+    const grad = ctx.createRadialGradient(W / 2, H * 0.3, 50, W / 2, H * 0.3, W * 0.8);
+    grad.addColorStop(0, 'rgba(255, 68, 51, 0.15)');
+    grad.addColorStop(1, 'rgba(15, 15, 17, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  } else {
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Border & Brutalist Accents
+  ctx.lineWidth = 14;
+  ctx.strokeStyle = currentStyle === 'dark' ? '#222226' : '#111111';
+  ctx.strokeRect(7, 7, W - 14, H - 14);
+
+  // 1. Header Wordmark
+  ctx.font = '900 48px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.fillStyle = currentStyle === 'dark' ? '#FFFFFF' : '#111111';
+  ctx.fillText('anything...', 80, 110);
+
+  // Category Pill
+  ctx.font = '800 24px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+  const catText = entityData.category.toUpperCase();
+  const catW = ctx.measureText(catText).width;
+  
+  ctx.fillStyle = '#FF4433';
+  ctx.fillRect(W - 80 - catW - 32, 72, catW + 32, 48);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(catText, W - 80 - catW - 16, 105);
+
+  let contentStartY = 200;
+
+  // 2. Media / Visual Artwork
+  if (loadedImage) {
+    const imgH = currentFormat === 'story' ? 620 : (currentFormat === 'portrait' ? 420 : 320);
+    const imgW = W - 160;
+    
+    // Draw shadow
+    ctx.fillStyle = currentStyle === 'dark' ? '#FF4433' : '#111111';
+    ctx.fillRect(88, contentStartY + 8, imgW, imgH);
+    
+    // Draw image
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(80, contentStartY, imgW, imgH);
+    ctx.clip();
+    
+    // Aspect fill image
+    const imgRatio = loadedImage.width / loadedImage.height;
+    const boxRatio = imgW / imgH;
+    let sw, sh, sx, sy;
+    if (imgRatio > boxRatio) {
+      sh = loadedImage.height;
+      sw = sh * boxRatio;
+      sx = (loadedImage.width - sw) / 2;
+      sy = 0;
+    } else {
+      sw = loadedImage.width;
+      sh = sw / boxRatio;
+      sx = 0;
+      sy = (loadedImage.height - sh) / 2;
+    }
+    ctx.drawImage(loadedImage, sx, sy, sw, sh, 80, contentStartY, imgW, imgH);
+    ctx.restore();
+
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#111111';
+    ctx.strokeRect(80, contentStartY, imgW, imgH);
+
+    contentStartY += imgH + 60;
+  } else {
+    // Abstract Typography Representation Box
+    const boxH = currentFormat === 'story' ? 400 : 250;
+    const boxW = W - 160;
+    ctx.fillStyle = currentStyle === 'dark' ? '#18181C' : '#F6F6F6';
+    ctx.fillRect(80, contentStartY, boxW, boxH);
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = currentStyle === 'dark' ? '#28282E' : '#111';
+    ctx.strokeRect(80, contentStartY, boxW, boxH);
+
+    ctx.font = '800 54px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = currentStyle === 'dark' ? '#FF4433' : '#111111';
+    ctx.textAlign = 'center';
+    ctx.fillText(entityData.category.toUpperCase(), W / 2, contentStartY + boxH / 2 + 18);
+    ctx.textAlign = 'left';
+
+    contentStartY += boxH + 60;
+  }
+
+  // 3. Entity Title & Rating
+  ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.fillStyle = currentStyle === 'dark' ? '#FFFFFF' : '#111111';
+  wrapText(ctx, entityData.name, 80, contentStartY, W - 160, 72, 2);
+
+  contentStartY += 90;
+
+  if (entityData.ratingScore) {
+    ctx.font = '800 42px -apple-system, sans-serif';
+    ctx.fillStyle = '#FF4433';
+    ctx.fillText(`★ ${entityData.ratingScore} / 5.0`, 80, contentStartY);
+    contentStartY += 60;
+  }
+
+  // 4. Review Content Quote
+  if (entityData.reviewContent) {
+    ctx.font = '400 36px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+    ctx.fillStyle = currentStyle === 'dark' ? '#D0D0D5' : '#333333';
+    
+    const quoteText = `"${entityData.reviewContent}"`;
+    const maxLines = currentFormat === 'story' ? 7 : (currentFormat === 'portrait' ? 5 : 3);
+    wrapText(ctx, quoteText, 80, contentStartY, W - 160, 48, maxLines);
+  }
+
+  // 5. Footer Author Info
+  const footerY = H - 90;
+  ctx.font = '700 32px -apple-system, sans-serif';
+  ctx.fillStyle = currentStyle === 'dark' ? 'rgba(255,255,255,0.7)' : '#555555';
+  ctx.fillText(`Perspective by @${entityData.author}`, 80, footerY);
+
+  ctx.font = '800 32px -apple-system, sans-serif';
+  ctx.fillStyle = '#FF4433';
+  const urlTxt = 'anything...';
+  const urlW = ctx.measureText(urlTxt).width;
+  ctx.fillText(urlTxt, W - 80 - urlW, footerY);
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const words = text.split(' ');
+  let line = '';
+  let linesCount = 0;
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+    
+    if (testWidth > maxWidth && n > 0) {
+      linesCount++;
+      if (linesCount >= maxLines) {
+        ctx.fillText(line.trim() + '...', x, y);
+        return;
+      }
+      ctx.fillText(line.trim(), x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line.trim(), x, y);
+}
+
+function downloadShareCard() {
+  const canvas = document.getElementById('shareCanvas');
+  const link = document.createElement('a');
+  link.download = `anything-${entityData.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-perspective.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function nativeWebShare() {
+  const canvas = document.getElementById('shareCanvas');
+  canvas.toBlob(blob => {
+    const file = new File([blob], 'anything-share-card.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: `${entityData.name} on anything...`,
+        text: `Check out this perspective on ${entityData.name} on anything...`
+      }).catch(err => console.log('Share canceled or failed', err));
+    } else {
+      downloadShareCard();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initStudio);
+</script>
+{% endblock %}

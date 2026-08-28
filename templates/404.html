@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}404 - Page Not Found | anything...{% endblock %}
+
+{% block content %}
+<div style="min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 3rem 1rem;">
+  <div style="max-width: 520px; background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 3.5rem 2rem;">
+    <div style="font-size: 5rem; font-weight: 900; line-height: 1; letter-spacing: -3px; margin-bottom: 1rem; color: #111;">404</div>
+    <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px;">Page Not Found</h1>
+    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
+      The item or page you are looking for does not exist, has been relocated, or is no longer available in the universal index.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{% url 'home' %}" class="btn btn-primary btn-md">Back to Home</a>
+      <a href="{% url 'entity_list' %}" class="btn btn-secondary btn-md">Explore Index</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

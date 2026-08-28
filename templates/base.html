@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}anything... — Discover, Rate & Review Anything{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}anything... is a universal platform to discover, rate, review, and contribute perspectives on movies, books, products, places, ideas, feelings, and anything under the sun.{% endblock %}">
+  
+  <!-- Cineast / anything... Design System -->
+  <link rel="stylesheet" href="{% static 'css/cineast.css' %}">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <div class="header-inner">
+        <!-- anything... Wordmark Brand -->
+        <a href="/" class="brand-logo-link" id="brandWordmark" style="text-decoration: none; display: flex; align-items: baseline; gap: 0.15rem;">
+          <span style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; font-size: 1.85rem; font-weight: 900; letter-spacing: -0.05em; color: #111111;">anything</span>
+          <span style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; font-size: 1.85rem; font-weight: 900; letter-spacing: -0.05em; color: var(--cineast-primary, #FF4433);">...</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav aria-label="Main Navigation">
+          <ul class="nav-menu">
+            <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}" id="navHome">Home</a></li>
+            <li><a href="/discover/" class="nav-link {% if '/discover/' in request.path or '/entities/' in request.path and not '/entities/add/' in request.path %}active{% endif %}" id="navDiscover">Explore</a></li>
+            <li><a href="/search/" class="nav-link {% if '/search/' in request.path %}active{% endif %}" id="navSearch">Search</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="/entities/add/" class="nav-link {% if '/entities/add/' in request.path %}active{% endif %}" id="navAddEntity">+ Add Anything</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+
+        <!-- Search & User Actions -->
+        <div class="header-actions">
+          <form action="/search/" method="GET" class="header-search-form" id="headerSearchForm">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" name="q" class="header-search-input" placeholder="Search anything (movies, tech, ideas)..." value="{{ request.GET.q|default:'' }}" id="headerSearchInput">
+          </form>
+
+          {% if user.is_authenticated %}
+          <div class="user-menu-wrapper">
+            <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-expanded="false">
+              <div class="avatar-circle">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+                {% else %}
+                  {{ user.username|slice:":1"|upper }}
+                {% endif %}
+              </div>
+              <span>{{ user.username }}</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="/user/{{ user.username }}/" class="dropdown-item" id="menuProfile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                My Profile
+              </a>
+              <a href="/entities/add/" class="dropdown-item" id="menuAddEntity">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                + Add Anything
+              </a>
+              {% if user.is_staff %}
+              <a href="/admin/" class="dropdown-item" id="menuAdmin" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Admin Panel
+              </a>
+              {% endif %}
+              <div class="dropdown-divider"></div>
+              <form action="/logout/" method="POST" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; background: none; border: none; cursor: pointer; color: var(--cineast-primary);" id="menuLogout">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                  Log Out
+                </button>
+              </form>
+            </div>
+          </div>
+          {% else %}
+          <a href="/login/" class="btn btn-ghost btn-sm" id="btnLogin">Sign In</a>
+          <a href="/register/" class="btn btn-primary btn-sm" id="btnRegister">Get Started</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="main-content" id="mainContent">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <a href="/" class="mobile-nav-item {% if request.path == '/' %}active{% endif %}" id="mobNavHome">
+      <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <span>Home</span>
+    </a>
+    <a href="/discover/" class="mobile-nav-item {% if '/discover/' in request.path %}active{% endif %}" id="mobNavDiscover">
+      <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+      <span>Explore</span>
+    </a>
+    <a href="/search/" class="mobile-nav-item {% if '/search/' in request.path %}active{% endif %}" id="mobNavSearch">
+      <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <span>Search</span>
+    </a>
+    {% if user.is_authenticated %}
+    <a href="/entities/add/" class="mobile-nav-item {% if '/entities/add/' in request.path %}active{% endif %}" id="mobNavAdd">
+      <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+      <span>Add</span>
+    </a>
+    <a href="/user/{{ user.username }}/" class="mobile-nav-item {% if '/user/' in request.path %}active{% endif %}" id="mobNavProfile">
+      <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span>Profile</span>
+    </a>
+    {% else %}
+    <a href="/login/" class="mobile-nav-item" id="mobNavLogin">
+      <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+      <span>Sign In</span>
+    </a>
+    {% endif %}
+  </nav>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast-msg toast-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; font-size: 1.5rem; font-weight: 900; letter-spacing: -0.05em; color: #111111;">
+            anything<span style="color: var(--cineast-primary, #FF4433);">...</span>
+          </div>
+          <p>© {% now "Y" %} anything... The universal platform to evaluate, review, and discuss anything.</p>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-size: 0.85rem;">If something can be experienced, discussed, or evaluated, it can exist here.</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core JavaScript -->
+  <script src="{% static 'js/cineast.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
