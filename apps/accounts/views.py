@@ -16,10 +16,17 @@ def login_view(request):
             messages.error(request, "Too many login attempts. Please wait 15 minutes before trying again.")
             return render(request, 'accounts/login.html', status=429)
 
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username_input = (request.POST.get('username') or '').strip()
+        password = request.POST.get('password') or ''
         next_url = request.POST.get('next') or 'home'
-        user = authenticate(request, username=username, password=password)
+
+        # Support login with either username or email
+        if '@' in username_input:
+            user_by_email = User.objects.filter(email__iexact=username_input).first()
+            if user_by_email:
+                username_input = user_by_email.username
+
+        user = authenticate(request, username=username_input, password=password)
         if user is not None:
             reset_rate_limit(request, 'auth_login')
             login(request, user)
@@ -29,6 +36,7 @@ def login_view(request):
             record_rate_limit_attempt(request, 'auth_login', timeout=900)
             messages.error(request, "Invalid username or password.")
     return render(request, 'accounts/login.html')
+
 
 def register_view(request):
     if request.user.is_authenticated:

@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Create Account — Cineast{% endblock %}
+{% block title %}Create Account — anything...{% endblock %}
 
 {% block content %}
 <div class="container container-narrow" style="padding-top: 3.5rem; max-width: 460px;">
   
   <div style="text-align: center; margin-bottom: 2rem;">
-    <img src="{% static 'images/logo.png' %}" alt="Cineast Logo" style="height: 52px; margin: 0 auto 1.5rem auto;">
-    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Join Cineast</h1>
-    <p class="text-secondary" style="font-size: 0.95rem;">Rate films, log reviews, share visual cards & contribute metadata</p>
+    <a href="{% url 'home' %}" style="display: inline-block; font-size: 2.25rem; font-weight: 900; letter-spacing: -1.5px; text-decoration: none; color: #111; margin-bottom: 0.75rem;">anything<span style="color: var(--primary);">...</span></a>
+    <h1 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem;">Join anything...</h1>
+    <p class="text-secondary" style="font-size: 0.95rem;">Rate, review, evaluate & contribute to the universal index</p>
   </div>
 
-  <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: var(--shadow-md);">
+  <div style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); padding: 2.25rem; box-shadow: var(--shadow-brutal-lg);">
     <form action="{% url 'register' %}" method="POST">
       {% csrf_token %}
+
       
       <div class="form-group">
         <label class="form-label" for="reg_username">Username *</label>
