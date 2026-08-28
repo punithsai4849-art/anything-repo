@@ -90,10 +90,13 @@
             </div>
           </div>
           {% else %}
-          <button type="button" class="btn btn-ghost btn-sm" onclick="startOnboardingTour(true)" style="cursor: pointer;">Tour</button>
-          <a href="/login/" class="btn btn-ghost btn-sm" id="btnLogin">Sign In</a>
-          <a href="/register/" class="btn btn-primary btn-sm" id="btnRegister">Get Started</a>
+          <div class="header-unauth-actions" style="display: flex; gap: 0.4rem; align-items: center;">
+            <button type="button" class="btn btn-ghost btn-sm header-tour-btn" onclick="startOnboardingTour(true)" style="cursor: pointer;">Tour</button>
+            <a href="/login/" class="btn btn-ghost btn-sm" id="btnLogin">Sign In</a>
+            <a href="/register/" class="btn btn-primary btn-sm" id="btnRegister">Get Started</a>
+          </div>
           {% endif %}
+
 
         </div>
       </div>

@@ -22,35 +22,36 @@
     </div>
 
     <!-- Category Pills Filter -->
-    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
-      <a href="{% url 'entity_list' %}" class="badge {% if not selected_category %}badge-primary{% else %}badge-subtle{% endif %}" style="padding: 0.5rem 0.9rem; font-size: 0.9rem; text-decoration: none; border: 1.5px solid #111;">
+    <div class="category-pills-scroll">
+      <a href="{% url 'entity_list' %}" class="badge {% if not selected_category %}badge-primary{% else %}badge-subtle{% endif %}" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; text-decoration: none; border: 1.5px solid #111;">
         All Categories
       </a>
       {% for cat in categories %}
-      <a href="{% url 'entity_list' %}?category={{ cat.slug }}" class="badge {% if selected_category.slug == cat.slug %}badge-primary{% else %}badge-subtle{% endif %}" style="padding: 0.5rem 0.9rem; font-size: 0.9rem; text-decoration: none; border: 1.5px solid #111;">
+      <a href="{% url 'entity_list' %}?category={{ cat.slug }}" class="badge {% if selected_category.slug == cat.slug %}badge-primary{% else %}badge-subtle{% endif %}" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; text-decoration: none; border: 1.5px solid #111;">
         {{ cat.name }} ({{ cat.e_count }})
       </a>
       {% endfor %}
     </div>
 
     <!-- Sort & Sub-filters -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--border-color); padding-top: 1rem;">
-      <div style="font-size: 0.9rem; color: var(--text-secondary);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; border-top: 1.5px solid var(--border-color); padding-top: 1rem;">
+      <div style="font-size: 0.85rem; color: var(--text-secondary);">
         Showing {{ page_obj.paginator.count }} item{{ page_obj.paginator.count|pluralize }}
       </div>
 
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary);">Sort:</span>
-        <a href="?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort=newest" class="badge {% if current_sort == 'newest' %}badge-primary{% else %}badge-subtle{% endif %}" style="text-decoration: none;">Newest</a>
-        <a href="?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort=popular" class="badge {% if current_sort == 'popular' %}badge-primary{% else %}badge-subtle{% endif %}" style="text-decoration: none;">Popular</a>
-        <a href="?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort=rating" class="badge {% if current_sort == 'rating' %}badge-primary{% else %}badge-subtle{% endif %}" style="text-decoration: none;">Top Rated</a>
+      <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">Sort:</span>
+        <a href="?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort=newest" class="badge {% if current_sort == 'newest' %}badge-primary{% else %}badge-subtle{% endif %}" style="text-decoration: none; font-size: 0.8rem; padding: 0.35rem 0.6rem;">Newest</a>
+        <a href="?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort=popular" class="badge {% if current_sort == 'popular' %}badge-primary{% else %}badge-subtle{% endif %}" style="text-decoration: none; font-size: 0.8rem; padding: 0.35rem 0.6rem;">Popular</a>
+        <a href="?{% if selected_category %}category={{ selected_category.slug }}&{% endif %}sort=rating" class="badge {% if current_sort == 'rating' %}badge-primary{% else %}badge-subtle{% endif %}" style="text-decoration: none; font-size: 0.8rem; padding: 0.35rem 0.6rem;">Top Rated</a>
       </div>
     </div>
   </div>
 
   <!-- Entities Grid -->
   {% if page_obj %}
-  <div class="movie-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.75rem;">
+  <div class="movie-grid">
+
     {% for entity in page_obj %}
     <a href="{% url 'entity_detail' entity.slug %}" class="movie-card" style="display: flex; flex-direction: column; text-decoration: none; color: inherit; height: 100%;">
       <div class="movie-poster-wrap" style="aspect-ratio: 4/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 2px solid #111;">

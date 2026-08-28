@@ -155,9 +155,10 @@
   {% endif %}
 
   <!-- Reviews & Contribution History -->
-  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; margin-bottom: 3rem;">
+  <div class="entity-reviews-layout" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; margin-bottom: 3rem;">
     
     <!-- Left Column: Community Reviews -->
+
     <div>
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em;">
@@ -244,7 +245,7 @@
         <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">
           Community Contribution Log
         </h3>
-        <div style="background: var(--bg-card); border: 2px solid #111; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-brutal-sm);">
+        <div class="table-responsive" style="background: var(--bg-card); border: 2px solid #111; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-brutal-sm);">
           <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
             <thead>
               <tr style="background: var(--bg-subtle); border-bottom: 2px solid #111; text-align: left;">
@@ -312,7 +313,8 @@
     
     <form action="{% url 'rate_entity' entity.id %}" method="POST">
       {% csrf_token %}
-      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+      <div class="rating-choices-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+
         {% for score_val in "0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0"|make_list_split:"," %}
         <label style="cursor: pointer;">
           <input type="radio" name="score" value="{{ score_val }}" {% if user_rating and user_rating.score|stringformat:".1f" == score_val %}checked{% endif %} style="display: none;" onchange="this.parentElement.style.background='var(--cineast-primary)';">

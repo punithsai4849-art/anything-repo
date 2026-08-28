@@ -7,10 +7,10 @@
 <div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
   
   <!-- Profile Header Card -->
-  <div style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem; margin-bottom: 3rem;">
-    <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+  <div class="form-container-card" style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem; margin-bottom: 3rem;">
+    <div class="profile-header-layout" style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
       
-      <div class="avatar-circle" style="width: 90px; height: 90px; font-size: 2.25rem; border: 2.5px solid #111; box-shadow: var(--shadow-brutal-sm);">
+      <div class="avatar-circle" style="width: 90px; height: 90px; font-size: 2.25rem; border: 2.5px solid #111; box-shadow: var(--shadow-brutal-sm); flex-shrink: 0;">
         {% if profile.avatar %}
           <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">
         {% else %}
@@ -18,9 +18,9 @@
         {% endif %}
       </div>
 
-      <div style="flex: 1; min-width: 260px;">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
-          <h1 style="font-size: 2.25rem; font-weight: 900; letter-spacing: -0.03em;">@{{ profile_user.username }}</h1>
+      <div style="flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
+          <h1 style="font-size: clamp(1.65rem, 4vw, 2.25rem); font-weight: 900; letter-spacing: -0.03em;">@{{ profile_user.username }}</h1>
           {% if profile_user == user %}
           <a href="{% url 'edit_profile' %}" class="btn btn-secondary btn-sm">Edit Profile</a>
           {% endif %}
@@ -31,28 +31,29 @@
         </p>
 
         <!-- Stats Counter Row -->
-        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-          <div style="border-left: 3px solid var(--cineast-primary); padding-left: 0.75rem;">
-            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.entities_rated_count }}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Rated</div>
+        <div class="profile-stats-row" style="display: flex; gap: 1.25rem; flex-wrap: wrap;">
+          <div style="border-left: 3px solid var(--cineast-primary); padding-left: 0.65rem;">
+            <div style="font-size: 1.25rem; font-weight: 900;">{{ profile.entities_rated_count }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Rated</div>
           </div>
-          <div style="border-left: 3px solid #111; padding-left: 0.75rem;">
-            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.reviews_count }}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Perspectives</div>
+          <div style="border-left: 3px solid #111; padding-left: 0.65rem;">
+            <div style="font-size: 1.25rem; font-weight: 900;">{{ profile.reviews_count }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Perspectives</div>
           </div>
-          <div style="border-left: 3px solid #111; padding-left: 0.75rem;">
-            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.entities_created_count }}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Created</div>
+          <div style="border-left: 3px solid #111; padding-left: 0.65rem;">
+            <div style="font-size: 1.25rem; font-weight: 900;">{{ profile.entities_created_count }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Created</div>
           </div>
-          <div style="border-left: 3px solid #111; padding-left: 0.75rem;">
-            <div style="font-size: 1.35rem; font-weight: 900;">{{ profile.contributions_count }}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Edits</div>
+          <div style="border-left: 3px solid #111; padding-left: 0.65rem;">
+            <div style="font-size: 1.25rem; font-weight: 900;">{{ profile.contributions_count }}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Edits</div>
           </div>
         </div>
 
       </div>
 
     </div>
+
   </div>
 
   <!-- Perspectives / Reviews Section -->
