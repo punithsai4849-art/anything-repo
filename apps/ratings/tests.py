@@ -8,8 +8,9 @@ from apps.ratings.models import Rating
 class RatingModelTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='rater', password='password123')
-        self.category = Category.objects.create(name='Places', slug='places')
+        self.category, _ = Category.objects.get_or_create(name='Places', slug='places')
         self.entity = Entity.objects.create(name='Hyderabad', category=self.category)
+
 
     def test_rating_creation_and_update(self):
         r, created = Rating.objects.update_or_create(

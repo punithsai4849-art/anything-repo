@@ -6,8 +6,9 @@ from apps.entities.models import Tag, Entity, EntityRelationship
 class EntityModelTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='tester', password='pass1234')
-        self.cat_movie = Category.objects.create(name='Movies', slug='movies', icon='')
-        self.cat_tech = Category.objects.create(name='Technology', slug='technology', icon='')
+        self.cat_movie, _ = Category.objects.get_or_create(name='Movies', slug='movies', defaults={'icon': ''})
+        self.cat_tech, _ = Category.objects.get_or_create(name='Technology', slug='technology', defaults={'icon': ''})
+
 
 
 

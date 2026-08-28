@@ -10,3 +10,7 @@ python manage.py collectstatic --no-input
 
 echo "==> Applying database migrations..."
 python manage.py migrate
+
+echo "==> Auto-seeding initial categories & items..."
+python manage.py populate_anything || true
+

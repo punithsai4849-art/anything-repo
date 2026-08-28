@@ -8,8 +8,9 @@ from apps.contributions.services import record_entity_edits
 class ContributionTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='contributor', password='password123')
-        self.category = Category.objects.create(name='Food', slug='food')
+        self.category, _ = Category.objects.get_or_create(name='Food', slug='food')
         self.entity = Entity.objects.create(
+
             name='Pizza Margherita',
             category=self.category,
             description='Old description'

@@ -70,8 +70,10 @@ def register_view(request):
         user = User.objects.create_user(username=username, email=email, password=password)
         reset_rate_limit(request, 'auth_register')
         login(request, user)
+        request.session['show_new_user_tour'] = True
         messages.success(request, f"Welcome to anything..., {user.username}! Your account has been created.")
         return redirect('home')
+
 
     return render(request, 'accounts/register.html')
 

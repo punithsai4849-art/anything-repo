@@ -8,8 +8,9 @@ from apps.reviews.models import Review
 class ReviewModelTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='critic', password='password123')
-        self.category = Category.objects.create(name='Apps', slug='apps')
+        self.category, _ = Category.objects.get_or_create(name='Apps', slug='apps')
         self.entity = Entity.objects.create(name='Spotify', category=self.category)
+
 
     def test_review_creation_and_excerpt(self):
         rev = Review.objects.create(

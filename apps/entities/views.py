@@ -23,14 +23,18 @@ def home_view(request):
     recent_reviews = Review.objects.select_related('user__profile', 'entity__category', 'rating').order_by('-created_at')[:6]
 
 
+    show_tour = request.session.pop('show_new_user_tour', False)
+
     context = {
         'featured_entity': featured_entity,
         'recent_entities': recent_entities,
         'popular_entities': popular_entities,
         'categories': categories,
         'recent_reviews': recent_reviews,
+        'show_tour': show_tour,
     }
     return render(request, 'entities/home.html', context)
+
 
 def entity_list_view(request):
     category_slug = request.GET.get('category')
