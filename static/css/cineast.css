@@ -1959,6 +1959,13 @@ textarea.form-control {
     margin: 0 auto !important;
   }
 
+  .profile-ratings-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   .profile-stats-row {
     justify-content: center !important;
   }
