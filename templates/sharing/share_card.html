@@ -4,77 +4,100 @@
 {% block title %}Share Perspective — {{ entity.name }} — anything...{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+<div class="container share-studio-container">
   
-  <div style="text-align: center; margin-bottom: 2.5rem;">
-    <a href="{% url 'entity_detail' entity.slug %}" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem;">
+  <div class="share-studio-header" style="text-align: center; margin-bottom: 1.5rem;">
+    <a href="{% url 'entity_detail' entity.slug %}" style="display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; transition: color 0.15s ease;">
       ← Back to {{ entity.name }}
     </a>
-    <h1 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em;">
+    <h1 style="font-size: 2.25rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 0.25rem;">
       Social Share Card Studio
     </h1>
-    <p class="text-lead" style="max-width: 550px; margin: 0 auto;">
-      Create a shareable visual card for your review and opinion.
+    <p class="text-lead" style="max-width: 520px; margin: 0 auto; font-size: 1rem;">
+      Generate an editorial poster card for your perspective to share on Instagram Stories, X, and WhatsApp.
     </p>
   </div>
 
-  <div class="share-studio-grid" style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 2.5rem; align-items: start; max-width: 1050px; margin: 0 auto;">
+  <div class="share-studio-grid">
     
     <!-- Controls Column -->
-    <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-md); padding: 1.75rem;">
+    <div class="share-controls-card">
       
-      <!-- Format Picker -->
-      <div class="form-group" style="margin-bottom: 1.5rem;">
-        <label class="form-label" style="font-size: 0.95rem;">1. Aspect Ratio Format</label>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+      <!-- 1. Format Picker -->
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label class="form-label" style="font-size: 0.88rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
+          1. Aspect Ratio Format
+        </label>
+        <div class="format-options-grid">
           <button type="button" class="btn btn-secondary format-btn active" onclick="setShareFormat('story', this)" id="btnFmtStory">
-            Story<br><small style="font-size: 0.75rem; opacity: 0.75;">9:16 (1080×1920)</small>
+            <strong>Story</strong>
+            <small>9:16</small>
           </button>
           <button type="button" class="btn btn-secondary format-btn" onclick="setShareFormat('portrait', this)" id="btnFmtPortrait">
-            Portrait<br><small style="font-size: 0.75rem; opacity: 0.75;">4:5 (1080×1350)</small>
+            <strong>Portrait</strong>
+            <small>4:5</small>
           </button>
           <button type="button" class="btn btn-secondary format-btn" onclick="setShareFormat('square', this)" id="btnFmtSquare">
-            Square<br><small style="font-size: 0.75rem; opacity: 0.75;">1:1 (1080×1080)</small>
+            <strong>Square</strong>
+            <small>1:1</small>
           </button>
         </div>
       </div>
 
-      <!-- Editorial Template Theme -->
+      <!-- 2. Visual Style Template -->
       <div class="form-group" style="margin-bottom: 1.5rem;">
-        <label class="form-label" style="font-size: 0.95rem;">2. Visual Style Template</label>
-        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-          <button type="button" class="btn btn-secondary style-btn active" onclick="setShareStyle('minimal', this)" style="text-align: left; justify-content: flex-start;">
-            <strong>Minimal Editorial</strong> (Clean white surface, bold typography)
+        <label class="form-label" style="font-size: 0.88rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
+          2. Visual Style Template
+        </label>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary style-btn active" onclick="setShareStyle('minimal', this)">
+            <span class="style-btn-title">✨ Minimal Editorial</span>
+            <span class="style-btn-desc">High-contrast Swiss poster & category badge</span>
           </button>
-          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('quote', this)" style="text-align: left; justify-content: flex-start;">
-            <strong>Perspective Focus</strong> (Prominent pull-quote & star rating)
+          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('quote', this)">
+            <span class="style-btn-title">💬 Perspective Focus</span>
+            <span class="style-btn-desc">Hero pull-quote & entity spotlight</span>
           </button>
-          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('dark', this)" style="text-align: left; justify-content: flex-start;">
-            <strong>Ambient Dark</strong> (Frosted dark canvas with #FF4433 accent)
+          <button type="button" class="btn btn-secondary style-btn" onclick="setShareStyle('dark', this)">
+            <span class="style-btn-title">🌌 Ambient Dark</span>
+            <span class="style-btn-desc">Cinematic frosted obsidian & coral glow</span>
           </button>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
-        <button type="button" class="btn btn-primary btn-lg" onclick="downloadShareCard()" style="box-shadow: var(--shadow-brutal-md);">
-          Download High-Res PNG
+      <!-- 3. Export Action Buttons -->
+      <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+        <button type="button" class="btn btn-primary btn-lg" onclick="downloadShareCard()" style="box-shadow: var(--shadow-brutal-md); width: 100%; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <span>📥</span> Download High-Res PNG
         </button>
-        <button type="button" class="btn btn-secondary" onclick="nativeWebShare()" id="btnWebShare">
-          Native Share
-        </button>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="copyCardToClipboard()" id="btnCopyClipboard" style="font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: normal;">
+            <span>📋</span> Copy Image
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="nativeWebShare()" id="btnWebShare" style="font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: normal;">
+            <span>🚀</span> Share Card
+          </button>
+        </div>
+      </div>
+
+      <div id="shareStatusToast" style="display: none; margin-top: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 700; text-align: center; background: #e6ffed; color: #027a48; border: 1.5px solid #a6f4c5;">
       </div>
 
     </div>
 
     <!-- Live Canvas Studio Preview Column -->
-    <div class="share-canvas-box" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-      <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.75rem;">
-        Live Render Preview
+    <div class="share-canvas-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0.5rem;">
+        <span style="font-weight: 800; font-size: 0.82rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">
+          Live Render Preview
+        </span>
+        <span id="previewDimensions" style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); background: var(--bg-card); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid var(--border-color);">
+          1080 × 1920 (9:16)
+        </span>
       </div>
       
-      <div style="background: #e8e8e8; border: 2.5px solid #111; border-radius: var(--radius-lg); box-shadow: var(--shadow-brutal-lg); padding: 1rem; max-width: 100%; width: 100%; display: flex; justify-content: center; overflow: hidden; box-sizing: border-box;">
-        <canvas id="shareCanvas" width="1080" height="1920" style="max-width: 100%; max-height: 520px; width: auto; height: auto; border-radius: 8px; border: 1.5px solid #222; background: #fff;"></canvas>
+      <div class="share-canvas-wrapper">
+        <canvas id="shareCanvas" width="1080" height="1920"></canvas>
       </div>
     </div>
 
@@ -93,10 +116,13 @@ const entityData = {
   reviewTitle: `{{ review.title|default:''|escapejs }}`,
   reviewContent: `{{ review.content|escapejs }}`,
   ratingScore: `{{ rating.score|default:'' }}`,
-  author: `{{ author.username|escapejs }}`
+  author: `{{ author.username|escapejs }}`,
+  year: `{{ year|default:''|escapejs }}`,
+  creator: `{{ creator|default:''|escapejs }}`
 };
 
 let loadedImage = null;
+let isImageSafe = true;
 
 function initStudio() {
   let imgUrl = entityData.imageUrl;
@@ -108,13 +134,15 @@ function initStudio() {
     img.crossOrigin = "anonymous";
     img.onload = () => {
       loadedImage = img;
+      isImageSafe = true;
       renderCard();
     };
     img.onerror = () => {
-      // Fallback: Retry without crossOrigin
+      // Fallback: load image without crossOrigin for rendering if possible
       const fallbackImg = new Image();
       fallbackImg.onload = () => {
         loadedImage = fallbackImg;
+        isImageSafe = false; // Tainted
         renderCard();
       };
       fallbackImg.onerror = () => {
@@ -129,19 +157,23 @@ function initStudio() {
   }
 }
 
-
 function setShareFormat(fmt, btn) {
   currentFormat = fmt;
   document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   
   const canvas = document.getElementById('shareCanvas');
+  const dimBadge = document.getElementById('previewDimensions');
+  
   if (fmt === 'story') {
     canvas.width = 1080; canvas.height = 1920;
+    if (dimBadge) dimBadge.innerText = '1080 × 1920 (9:16)';
   } else if (fmt === 'portrait') {
     canvas.width = 1080; canvas.height = 1350;
+    if (dimBadge) dimBadge.innerText = '1080 × 1350 (4:5)';
   } else if (fmt === 'square') {
     canvas.width = 1080; canvas.height = 1080;
+    if (dimBadge) dimBadge.innerText = '1080 × 1080 (1:1)';
   }
   renderCard();
 }
@@ -153,191 +185,807 @@ function setShareStyle(styleName, btn) {
   renderCard();
 }
 
+// Helper: Rounded Rectangle
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+// Helper: Text Wrapping with line calculation
+function getWrappedLines(ctx, text, maxWidth) {
+  if (!text) return [];
+  const words = text.replace(/\r\n/g, ' ').replace(/\n/g, ' ').split(/\s+/);
+  const lines = [];
+  let currentLine = '';
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = currentLine ? (currentLine + ' ' + words[n]) : words[n];
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = words[n];
+    } else {
+      currentLine = testLine;
+    }
+  }
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  return lines;
+}
+
+// Helper: Draw Stars
+function drawStarRating(ctx, x, y, scoreNum, starSize, filledColor, emptyColor) {
+  const totalStars = 5;
+  const gap = starSize * 0.35;
+
+  ctx.save();
+  ctx.font = `900 ${starSize}px sans-serif`;
+  ctx.textBaseline = 'middle';
+  
+  for (let i = 1; i <= totalStars; i++) {
+    const starX = x + (i - 1) * (starSize + gap);
+    if (scoreNum >= i) {
+      ctx.fillStyle = filledColor;
+      ctx.fillText('★', starX, y);
+    } else if (scoreNum >= i - 0.5) {
+      ctx.fillStyle = filledColor;
+      ctx.fillText('★', starX, y);
+    } else {
+      ctx.fillStyle = emptyColor;
+      ctx.fillText('★', starX, y);
+    }
+  }
+  ctx.restore();
+}
+
 function renderCard() {
   const canvas = document.getElementById('shareCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
   const H = canvas.height;
 
-  // Background
-  if (currentStyle === 'dark') {
-    ctx.fillStyle = '#0F0F11';
-    ctx.fillRect(0, 0, W, H);
-    // Subtle gradient glow
-    const grad = ctx.createRadialGradient(W / 2, H * 0.3, 50, W / 2, H * 0.3, W * 0.8);
-    grad.addColorStop(0, 'rgba(255, 68, 51, 0.15)');
-    grad.addColorStop(1, 'rgba(15, 15, 17, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-  } else {
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, W, H);
+  ctx.clearRect(0, 0, W, H);
+
+  if (currentStyle === 'minimal') {
+    renderMinimalEditorial(ctx, W, H);
+  } else if (currentStyle === 'quote') {
+    renderPerspectiveFocus(ctx, W, H);
+  } else if (currentStyle === 'dark') {
+    renderAmbientDark(ctx, W, H);
   }
-
-  // Border & Brutalist Accents
-  ctx.lineWidth = 14;
-  ctx.strokeStyle = currentStyle === 'dark' ? '#222226' : '#111111';
-  ctx.strokeRect(7, 7, W - 14, H - 14);
-
-  // 1. Header Wordmark
-  ctx.font = '900 48px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
-  ctx.fillStyle = currentStyle === 'dark' ? '#FFFFFF' : '#111111';
-  ctx.fillText('anything...', 80, 110);
-
-  // Category Pill
-  ctx.font = '800 24px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
-  const catText = entityData.category.toUpperCase();
-  const catW = ctx.measureText(catText).width;
-  
-  ctx.fillStyle = '#FF4433';
-  ctx.fillRect(W - 80 - catW - 32, 72, catW + 32, 48);
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(catText, W - 80 - catW - 16, 105);
-
-  let contentStartY = 200;
-
-  // 2. Media / Visual Artwork
-  if (loadedImage) {
-    const imgH = currentFormat === 'story' ? 620 : (currentFormat === 'portrait' ? 420 : 320);
-    const imgW = W - 160;
-    
-    // Draw shadow
-    ctx.fillStyle = currentStyle === 'dark' ? '#FF4433' : '#111111';
-    ctx.fillRect(88, contentStartY + 8, imgW, imgH);
-    
-    // Draw image
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(80, contentStartY, imgW, imgH);
-    ctx.clip();
-    
-    // Aspect fill image
-    const imgRatio = loadedImage.width / loadedImage.height;
-    const boxRatio = imgW / imgH;
-    let sw, sh, sx, sy;
-    if (imgRatio > boxRatio) {
-      sh = loadedImage.height;
-      sw = sh * boxRatio;
-      sx = (loadedImage.width - sw) / 2;
-      sy = 0;
-    } else {
-      sw = loadedImage.width;
-      sh = sw / boxRatio;
-      sx = 0;
-      sy = (loadedImage.height - sh) / 2;
-    }
-    ctx.drawImage(loadedImage, sx, sy, sw, sh, 80, contentStartY, imgW, imgH);
-    ctx.restore();
-
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = '#111111';
-    ctx.strokeRect(80, contentStartY, imgW, imgH);
-
-    contentStartY += imgH + 60;
-  } else {
-    // Abstract Typography Representation Box
-    const boxH = currentFormat === 'story' ? 400 : 250;
-    const boxW = W - 160;
-    ctx.fillStyle = currentStyle === 'dark' ? '#18181C' : '#F6F6F6';
-    ctx.fillRect(80, contentStartY, boxW, boxH);
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = currentStyle === 'dark' ? '#28282E' : '#111';
-    ctx.strokeRect(80, contentStartY, boxW, boxH);
-
-    ctx.font = '800 54px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
-    ctx.fillStyle = currentStyle === 'dark' ? '#FF4433' : '#111111';
-    ctx.textAlign = 'center';
-    ctx.fillText(entityData.category.toUpperCase(), W / 2, contentStartY + boxH / 2 + 18);
-    ctx.textAlign = 'left';
-
-    contentStartY += boxH + 60;
-  }
-
-  // 3. Entity Title & Rating
-  ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
-  ctx.fillStyle = currentStyle === 'dark' ? '#FFFFFF' : '#111111';
-  wrapText(ctx, entityData.name, 80, contentStartY, W - 160, 72, 2);
-
-  contentStartY += 90;
-
-  if (entityData.ratingScore) {
-    ctx.font = '800 42px -apple-system, sans-serif';
-    ctx.fillStyle = '#FF4433';
-    ctx.fillText(`★ ${entityData.ratingScore} / 5.0`, 80, contentStartY);
-    contentStartY += 60;
-  }
-
-  // 4. Review Content Quote
-  if (entityData.reviewContent) {
-    ctx.font = '400 36px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
-    ctx.fillStyle = currentStyle === 'dark' ? '#D0D0D5' : '#333333';
-    
-    const quoteText = `"${entityData.reviewContent}"`;
-    const maxLines = currentFormat === 'story' ? 7 : (currentFormat === 'portrait' ? 5 : 3);
-    wrapText(ctx, quoteText, 80, contentStartY, W - 160, 48, maxLines);
-  }
-
-  // 5. Footer Author Info
-  const footerY = H - 90;
-  ctx.font = '700 32px -apple-system, sans-serif';
-  ctx.fillStyle = currentStyle === 'dark' ? 'rgba(255,255,255,0.7)' : '#555555';
-  ctx.fillText(`Perspective by @${entityData.author}`, 80, footerY);
-
-  ctx.font = '800 32px -apple-system, sans-serif';
-  ctx.fillStyle = '#FF4433';
-  const urlTxt = 'anything...';
-  const urlW = ctx.measureText(urlTxt).width;
-  ctx.fillText(urlTxt, W - 80 - urlW, footerY);
 }
 
-function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
-  const words = text.split(' ');
-  let line = '';
-  let linesCount = 0;
+/* =========================================================================
+   1. MINIMAL EDITORIAL (Neo-Brutalist Swiss Poster)
+   ========================================================================= */
+function renderMinimalEditorial(ctx, W, H) {
+  // Background
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, W, H);
 
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + ' ';
-    const metrics = ctx.measureText(testLine);
-    const testWidth = metrics.width;
-    
-    if (testWidth > maxWidth && n > 0) {
-      linesCount++;
-      if (linesCount >= maxLines) {
-        ctx.fillText(line.trim() + '...', x, y);
-        return;
-      }
-      ctx.fillText(line.trim(), x, y);
-      line = words[n] + ' ';
-      y += lineHeight;
+  // Outer Border & Brutalist Frame
+  ctx.lineWidth = 14;
+  ctx.strokeStyle = '#111111';
+  ctx.strokeRect(7, 7, W - 14, H - 14);
+
+  // Inner Accent Line
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#E0E0E0';
+  ctx.strokeRect(36, 36, W - 72, H - 72);
+
+  // 1. Header Wordmark & Category Pill
+  ctx.fillStyle = '#111111';
+  ctx.font = '900 46px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('anything...', 70, 95);
+
+  const catText = (entityData.category || 'PERSPECTIVE').toUpperCase();
+  ctx.font = '800 22px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+  const catWidth = ctx.measureText(catText).width;
+  const pillW = catWidth + 36;
+  const pillH = 44;
+  const pillX = W - 70 - pillW;
+  const pillY = 73;
+
+  // Brutalist Pill Shadow
+  ctx.fillStyle = '#111111';
+  drawRoundedRect(ctx, pillX + 4, pillY + 4, pillW, pillH, 8);
+  ctx.fill();
+  // Pill Body
+  ctx.fillStyle = '#FF4433';
+  drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 8);
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = '#111111';
+  ctx.stroke();
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(catText, pillX + 18, pillY + pillH / 2);
+
+  // Layout Calculations
+  let padX = 70;
+  let availW = W - padX * 2;
+  let currentY = 160;
+
+  // Media Section
+  if (currentFormat === 'story') {
+    // 9:16 Story layout
+    const imgH = loadedImage ? 640 : 380;
+    renderMediaBox(ctx, padX, currentY, availW, imgH, '#111111', '#F5F5F7', false);
+    currentY += imgH + 45;
+
+    // Entity Title
+    ctx.font = '900 58px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#111111';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, availW);
+    const maxTitle = Math.min(titleLines.length, 2);
+    for (let i = 0; i < maxTitle; i++) {
+      ctx.fillText(titleLines[i], padX, currentY);
+      currentY += 66;
+    }
+
+    // Subtitle (Year / Creator)
+    const subText = [entityData.year, entityData.creator].filter(Boolean).join(' • ');
+    if (subText) {
+      ctx.font = '700 26px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+      ctx.fillStyle = '#666666';
+      ctx.fillText(subText, padX, currentY);
+      currentY += 40;
     } else {
-      line = testLine;
+      currentY += 10;
+    }
+
+    // Rating Box
+    if (entityData.ratingScore) {
+      currentY += 15;
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      drawStarRating(ctx, padX, currentY + 16, scoreVal, 38, '#FF4433', '#E0E0E0');
+      
+      // Score Badge Pill
+      ctx.font = '900 24px -apple-system, sans-serif';
+      const badgeText = `★ ${scoreVal.toFixed(1)} / 5.0`;
+      const bw = ctx.measureText(badgeText).width + 30;
+      const bx = padX + 220;
+      ctx.fillStyle = '#111111';
+      drawRoundedRect(ctx, bx + 3, currentY + 1, bw, 34, 6);
+      ctx.fill();
+      ctx.fillStyle = '#FFF8E6';
+      drawRoundedRect(ctx, bx, currentY - 2, bw, 34, 6);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#111111';
+      ctx.stroke();
+      ctx.fillStyle = '#111111';
+      ctx.fillText(badgeText, bx + 15, currentY + 4);
+
+      currentY += 60;
+    }
+
+    // Quote Box
+    if (entityData.reviewContent) {
+      currentY += 15;
+      const quoteBoxH = H - currentY - 180;
+      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 260), '#F7F7F9', '#111111', '#FF4433', false);
+    }
+
+  } else if (currentFormat === 'portrait') {
+    // 4:5 Portrait layout
+    const imgH = loadedImage ? 440 : 280;
+    renderMediaBox(ctx, padX, currentY, availW, imgH, '#111111', '#F5F5F7', false);
+    currentY += imgH + 35;
+
+    // Entity Title
+    ctx.font = '900 50px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#111111';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, availW);
+    for (let i = 0; i < Math.min(titleLines.length, 2); i++) {
+      ctx.fillText(titleLines[i], padX, currentY);
+      currentY += 58;
+    }
+
+    // Rating & Quote
+    if (entityData.ratingScore) {
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      drawStarRating(ctx, padX, currentY + 14, scoreVal, 32, '#FF4433', '#E0E0E0');
+      currentY += 45;
+    }
+
+    if (entityData.reviewContent) {
+      const quoteBoxH = H - currentY - 150;
+      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 200), '#F7F7F9', '#111111', '#FF4433', false);
+    }
+
+  } else {
+    // 1:1 Square layout
+    const imgH = loadedImage ? 340 : 200;
+    renderMediaBox(ctx, padX, currentY, availW, imgH, '#111111', '#F5F5F7', false);
+    currentY += imgH + 28;
+
+    ctx.font = '900 44px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#111111';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, availW);
+    ctx.fillText(titleLines[0] || entityData.name, padX, currentY);
+    currentY += 52;
+
+    if (entityData.ratingScore) {
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      drawStarRating(ctx, padX, currentY + 12, scoreVal, 28, '#FF4433', '#E0E0E0');
+      currentY += 38;
+    }
+
+    if (entityData.reviewContent) {
+      const quoteBoxH = H - currentY - 130;
+      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 150), '#F7F7F9', '#111111', '#FF4433', false);
     }
   }
-  ctx.fillText(line.trim(), x, y);
+
+  // Footer Signature
+  renderFooter(ctx, W, H, '#555555', '#111111', '#FF4433', false);
+}
+
+/* =========================================================================
+   2. PERSPECTIVE FOCUS (Hero Pull-Quote & Critique)
+   ========================================================================= */
+function renderPerspectiveFocus(ctx, W, H) {
+  // Deep Warm Charcoal
+  ctx.fillStyle = '#161413';
+  ctx.fillRect(0, 0, W, H);
+
+  // Warm Amber Radial Ambient Glow
+  const grad = ctx.createRadialGradient(W / 2, H * 0.35, 80, W / 2, H * 0.35, W * 0.75);
+  grad.addColorStop(0, 'rgba(255, 107, 74, 0.18)');
+  grad.addColorStop(1, 'rgba(22, 20, 19, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Elegant Double Border
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = '#FF6B4A';
+  ctx.strokeRect(5, 5, W - 10, H - 10);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#38322E';
+  ctx.strokeRect(26, 26, W - 52, H - 52);
+
+  // Header
+  ctx.fillStyle = '#FFF8F4';
+  ctx.font = '900 46px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('anything...', 70, 95);
+
+  const catText = (entityData.category || 'PERSPECTIVE').toUpperCase();
+  ctx.font = '800 22px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+  const catWidth = ctx.measureText(catText).width;
+  const pillW = catWidth + 36;
+  const pillH = 44;
+  const pillX = W - 70 - pillW;
+  const pillY = 73;
+
+  ctx.fillStyle = '#2A1F1A';
+  drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 8);
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#FF6B4A';
+  ctx.stroke();
+
+  ctx.fillStyle = '#FF9E80';
+  ctx.fillText(catText, pillX + 18, pillY + pillH / 2);
+
+  const padX = 70;
+  const availW = W - padX * 2;
+  let currentY = 160;
+
+  // Giant Decorative Quotation Mark Watermark
+  ctx.font = '900 210px Georgia, serif';
+  ctx.fillStyle = 'rgba(255, 107, 74, 0.18)';
+  ctx.textBaseline = 'top';
+  ctx.fillText('“', padX - 20, currentY - 30);
+
+  currentY += 40;
+
+  // Hero Pull-Quote
+  const quote = entityData.reviewContent ? `“${entityData.reviewContent}”` : `“Exceptional work that demands your attention.”`;
+  const quoteFontSize = quote.length < 70 ? (currentFormat === 'story' ? 56 : 46) : (currentFormat === 'story' ? 44 : 36);
+  ctx.font = `600 ${quoteFontSize}px Georgia, "Times New Roman", serif`;
+  ctx.fillStyle = '#FFFDFC';
+  ctx.textBaseline = 'top';
+
+  const qLines = getWrappedLines(ctx, quote, availW);
+  const maxQLines = currentFormat === 'story' ? 7 : (currentFormat === 'portrait' ? 5 : 3);
+  const lineHeight = quoteFontSize * 1.42;
+
+  for (let i = 0; i < Math.min(qLines.length, maxQLines); i++) {
+    let lineStr = qLines[i];
+    if (i === maxQLines - 1 && qLines.length > maxQLines) {
+      lineStr = lineStr.replace(/[\.,; ]+$/, '') + '...”';
+    }
+    ctx.fillText(lineStr, padX, currentY);
+    currentY += lineHeight;
+  }
+
+  currentY += 25;
+
+  // Star Rating Display
+  if (entityData.ratingScore) {
+    const scoreVal = parseFloat(entityData.ratingScore) || 0;
+    drawStarRating(ctx, padX, currentY + 16, scoreVal, 42, '#FF7A59', '#3D3430');
+    
+    ctx.font = '800 28px -apple-system, sans-serif';
+    ctx.fillStyle = '#FFB899';
+    ctx.fillText(`${scoreVal.toFixed(1)} / 5.0 Rating`, padX + 240, currentY + 16);
+    currentY += 60;
+  }
+
+  // Entity Spotlight Banner Card (near bottom above footer)
+  const spotCardH = currentFormat === 'story' ? 240 : (currentFormat === 'portrait' ? 200 : 160);
+  const spotCardY = currentFormat === 'story' ? Math.max(currentY + 40, H - spotCardH - 180) : (H - spotCardH - 150);
+
+  // Spotlight Box
+  ctx.fillStyle = '#221E1C';
+  drawRoundedRect(ctx, padX, spotCardY, availW, spotCardH, 16);
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = '#38322E';
+  ctx.stroke();
+
+  // Thumbnail Artwork in Spotlight
+  const thumbSize = spotCardH - 36;
+  const thumbX = padX + 18;
+  const thumbY = spotCardY + 18;
+
+  if (loadedImage) {
+    ctx.save();
+    drawRoundedRect(ctx, thumbX, thumbY, thumbSize, thumbSize, 12);
+    ctx.clip();
+    drawImageAspectFill(ctx, loadedImage, thumbX, thumbY, thumbSize, thumbSize);
+    ctx.restore();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#FF6B4A';
+    drawRoundedRect(ctx, thumbX, thumbY, thumbSize, thumbSize, 12);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = '#2E2825';
+    drawRoundedRect(ctx, thumbX, thumbY, thumbSize, thumbSize, 12);
+    ctx.fill();
+    ctx.font = '900 36px -apple-system, sans-serif';
+    ctx.fillStyle = '#FF7A59';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(entityData.category.slice(0, 3).toUpperCase(), thumbX + thumbSize / 2, thumbY + thumbSize / 2);
+    ctx.textAlign = 'left';
+  }
+
+  // Spotlight Text
+  const textLeft = thumbX + thumbSize + 24;
+  const textAvailW = availW - thumbSize - 56;
+  
+  ctx.fillStyle = '#FFF8F4';
+  ctx.font = '900 40px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.textBaseline = 'top';
+  const spotTitleLines = getWrappedLines(ctx, entityData.name, textAvailW);
+  ctx.fillText(spotTitleLines[0] || entityData.name, textLeft, spotCardY + 28);
+
+  const metaStr = [entityData.category, entityData.year, entityData.creator].filter(Boolean).join(' • ');
+  ctx.font = '700 24px -apple-system, sans-serif';
+  ctx.fillStyle = '#B3A298';
+  ctx.fillText(metaStr, textLeft, spotCardY + 84);
+
+  // Footer Signature
+  renderFooter(ctx, W, H, '#8F827A', '#FF9E80', '#FF6B4A', true);
+}
+
+/* =========================================================================
+   3. AMBIENT DARK (Cinematic Frosted Canvas)
+   ========================================================================= */
+function renderAmbientDark(ctx, W, H) {
+  // Deep Obsidian Canvas
+  ctx.fillStyle = '#0B0C10';
+  ctx.fillRect(0, 0, W, H);
+
+  // Luminous Gradient Orbs
+  const grad1 = ctx.createRadialGradient(W * 0.25, H * 0.25, 40, W * 0.25, H * 0.25, W * 0.8);
+  grad1.addColorStop(0, 'rgba(255, 68, 51, 0.24)');
+  grad1.addColorStop(1, 'rgba(11, 12, 16, 0)');
+  ctx.fillStyle = grad1;
+  ctx.fillRect(0, 0, W, H);
+
+  const grad2 = ctx.createRadialGradient(W * 0.8, H * 0.75, 40, W * 0.8, H * 0.75, W * 0.7);
+  grad2.addColorStop(0, 'rgba(88, 60, 240, 0.20)');
+  grad2.addColorStop(1, 'rgba(11, 12, 16, 0)');
+  ctx.fillStyle = grad2;
+  ctx.fillRect(0, 0, W, H);
+
+  // Outer Frosted Border
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = 'rgba(255, 68, 51, 0.5)';
+  ctx.strokeRect(4, 4, W - 8, H - 8);
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.strokeRect(30, 30, W - 60, H - 60);
+
+  // Header
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '900 46px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('anything...', 70, 95);
+
+  const catText = (entityData.category || 'PERSPECTIVE').toUpperCase();
+  ctx.font = '800 22px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+  const catWidth = ctx.measureText(catText).width;
+  const pillW = catWidth + 36;
+  const pillH = 44;
+  const pillX = W - 70 - pillW;
+  const pillY = 73;
+
+  ctx.fillStyle = 'rgba(255, 68, 51, 0.18)';
+  drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 8);
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#FF4433';
+  ctx.stroke();
+
+  ctx.fillStyle = '#FF7A6B';
+  ctx.fillText(catText, pillX + 18, pillY + pillH / 2);
+
+  const padX = 70;
+  const availW = W - padX * 2;
+  let currentY = 160;
+
+  if (currentFormat === 'story') {
+    const imgH = loadedImage ? 640 : 380;
+    renderMediaBox(ctx, padX, currentY, availW, imgH, '#FF4433', 'rgba(255,255,255,0.06)', true);
+    currentY += imgH + 45;
+
+    // Entity Title
+    ctx.font = '900 58px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, availW);
+    for (let i = 0; i < Math.min(titleLines.length, 2); i++) {
+      ctx.fillText(titleLines[i], padX, currentY);
+      currentY += 66;
+    }
+
+    // Subtitle
+    const subText = [entityData.year, entityData.creator].filter(Boolean).join(' • ');
+    if (subText) {
+      ctx.font = '700 26px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fillText(subText, padX, currentY);
+      currentY += 40;
+    } else {
+      currentY += 10;
+    }
+
+    // Rating
+    if (entityData.ratingScore) {
+      currentY += 15;
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      drawStarRating(ctx, padX, currentY + 16, scoreVal, 38, '#FF4433', 'rgba(255,255,255,0.2)');
+      
+      ctx.font = '800 28px -apple-system, sans-serif';
+      ctx.fillStyle = '#FF7A6B';
+      ctx.fillText(`★ ${scoreVal.toFixed(1)} / 5.0`, padX + 230, currentY + 16);
+      currentY += 60;
+    }
+
+    // Quote Box
+    if (entityData.reviewContent) {
+      currentY += 15;
+      const quoteBoxH = H - currentY - 180;
+      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 260), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true);
+    }
+
+  } else if (currentFormat === 'portrait') {
+    const imgH = loadedImage ? 440 : 280;
+    renderMediaBox(ctx, padX, currentY, availW, imgH, '#FF4433', 'rgba(255,255,255,0.06)', true);
+    currentY += imgH + 35;
+
+    ctx.font = '900 50px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, availW);
+    for (let i = 0; i < Math.min(titleLines.length, 2); i++) {
+      ctx.fillText(titleLines[i], padX, currentY);
+      currentY += 58;
+    }
+
+    if (entityData.ratingScore) {
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      drawStarRating(ctx, padX, currentY + 14, scoreVal, 32, '#FF4433', 'rgba(255,255,255,0.2)');
+      currentY += 45;
+    }
+
+    if (entityData.reviewContent) {
+      const quoteBoxH = H - currentY - 150;
+      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 200), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true);
+    }
+
+  } else {
+    const imgH = loadedImage ? 340 : 200;
+    renderMediaBox(ctx, padX, currentY, availW, imgH, '#FF4433', 'rgba(255,255,255,0.06)', true);
+    currentY += imgH + 28;
+
+    ctx.font = '900 44px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    const titleLines = getWrappedLines(ctx, entityData.name, availW);
+    ctx.fillText(titleLines[0] || entityData.name, padX, currentY);
+    currentY += 52;
+
+    if (entityData.ratingScore) {
+      const scoreVal = parseFloat(entityData.ratingScore) || 0;
+      drawStarRating(ctx, padX, currentY + 12, scoreVal, 28, '#FF4433', 'rgba(255,255,255,0.2)');
+      currentY += 38;
+    }
+
+    if (entityData.reviewContent) {
+      const quoteBoxH = H - currentY - 130;
+      renderQuoteBox(ctx, padX, currentY, availW, Math.max(quoteBoxH, 150), 'rgba(255, 255, 255, 0.05)', '#FFFFFF', '#FF4433', true);
+    }
+  }
+
+  // Footer Signature
+  renderFooter(ctx, W, H, 'rgba(255,255,255,0.7)', '#FFFFFF', '#FF4433', true);
+}
+
+/* =========================================================================
+   REUSABLE CANVAS DRAWING HELPERS
+   ========================================================================= */
+
+function renderMediaBox(ctx, x, y, width, height, shadowColor, bgFallback, isDark) {
+  if (loadedImage) {
+    // Shadow / Halo
+    if (isDark) {
+      ctx.fillStyle = shadowColor;
+      drawRoundedRect(ctx, x + 6, y + 8, width, height, 16);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = shadowColor;
+      drawRoundedRect(ctx, x + 10, y + 10, width, height, 16);
+      ctx.fill();
+    }
+
+    // Image Clip & Aspect Fill
+    ctx.save();
+    drawRoundedRect(ctx, x, y, width, height, 16);
+    ctx.clip();
+    drawImageAspectFill(ctx, loadedImage, x, y, width, height);
+    ctx.restore();
+
+    // Border
+    ctx.lineWidth = isDark ? 3 : 5;
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.3)' : '#111111';
+    drawRoundedRect(ctx, x, y, width, height, 16);
+    ctx.stroke();
+
+  } else {
+    // Abstract Typography Representation Card
+    ctx.fillStyle = bgFallback;
+    drawRoundedRect(ctx, x, y, width, height, 16);
+    ctx.fill();
+    ctx.lineWidth = isDark ? 2 : 4;
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : '#111111';
+    drawRoundedRect(ctx, x, y, width, height, 16);
+    ctx.stroke();
+
+    // Decorative geometric monogram
+    ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.fillStyle = isDark ? '#FF4433' : '#111111';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(entityData.category.toUpperCase(), x + width / 2, y + height / 2 - 10);
+
+    ctx.font = '700 24px -apple-system, sans-serif';
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.5)' : '#888888';
+    ctx.fillText('CURATED PERSPECTIVE', x + width / 2, y + height / 2 + 38);
+    ctx.textAlign = 'left';
+  }
+}
+
+function drawImageAspectFill(ctx, img, x, y, width, height) {
+  const imgRatio = img.width / img.height;
+  const boxRatio = width / height;
+  let sw, sh, sx, sy;
+
+  if (imgRatio > boxRatio) {
+    sh = img.height;
+    sw = sh * boxRatio;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else {
+    sw = img.width;
+    sh = sw / boxRatio;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, width, height);
+}
+
+function renderQuoteBox(ctx, x, y, width, height, bgColor, textColor, accentColor, isDark) {
+  // Quote Container Box
+  ctx.fillStyle = bgColor;
+  drawRoundedRect(ctx, x, y, width, height, 16);
+  ctx.fill();
+
+  ctx.lineWidth = isDark ? 2 : 3.5;
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.12)' : '#111111';
+  drawRoundedRect(ctx, x, y, width, height, 16);
+  ctx.stroke();
+
+  // Quote Decorative Glyph
+  ctx.font = '900 68px Georgia, serif';
+  ctx.fillStyle = accentColor;
+  ctx.textBaseline = 'top';
+  ctx.fillText('“', x + 24, y + 16);
+
+  // Quote Text
+  const quoteText = `"${entityData.reviewContent}"`;
+  const textPadX = x + 28;
+  const textPadY = y + 74;
+  const maxTextW = width - 56;
+
+  ctx.font = '500 34px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+  ctx.fillStyle = textColor;
+  const qLines = getWrappedLines(ctx, quoteText, maxTextW);
+  const maxAllowedLines = Math.floor((height - 90) / 46);
+
+  let drawY = textPadY;
+  for (let i = 0; i < Math.min(qLines.length, maxAllowedLines); i++) {
+    let lineStr = qLines[i];
+    if (i === maxAllowedLines - 1 && qLines.length > maxAllowedLines) {
+      lineStr = lineStr.replace(/[\.,; ]+$/, '') + '...”';
+    }
+    ctx.fillText(lineStr, textPadX, drawY);
+    drawY += 46;
+  }
+}
+
+function renderFooter(ctx, W, H, labelColor, handleColor, brandColor, isDark) {
+  const footerY = H - 85;
+  
+  // Reviewer Pill Capsule
+  ctx.font = '800 28px -apple-system, sans-serif';
+  ctx.textBaseline = 'middle';
+  
+  const handleStr = `@${entityData.author}`;
+  const labelStr = 'Perspective by ';
+  
+  ctx.fillStyle = labelColor;
+  ctx.fillText(labelStr, 70, footerY);
+
+  const labelW = ctx.measureText(labelStr).width;
+  ctx.fillStyle = handleColor;
+  ctx.fillText(handleStr, 70 + labelW, footerY);
+
+  // Verified Badge
+  ctx.fillStyle = brandColor;
+  ctx.fillText('✓', 70 + labelW + ctx.measureText(handleStr).width + 10, footerY);
+
+  // Platform Stamp
+  const brandTxt = 'anything...';
+  ctx.font = '900 32px -apple-system, sans-serif';
+  const brandW = ctx.measureText(brandTxt).width;
+  
+  ctx.fillStyle = brandColor;
+  ctx.fillText(brandTxt, W - 70 - brandW, footerY);
+}
+
+/* =========================================================================
+   USER ACTIONS: DOWNLOAD, COPY, NATIVE SHARE
+   ========================================================================= */
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('shareStatusToast');
+  if (!toast) return;
+  toast.innerText = msg;
+  toast.style.display = 'block';
+  toast.style.background = isError ? '#ffebeb' : '#e6ffed';
+  toast.style.color = isError ? '#c92a2a' : '#027a48';
+  toast.style.borderColor = isError ? '#ffa8a8' : '#a6f4c5';
+
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 4000);
 }
 
 function downloadShareCard() {
   const canvas = document.getElementById('shareCanvas');
-  const link = document.createElement('a');
-  link.download = `anything-${entityData.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-perspective.png`;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  try {
+    const link = document.createElement('a');
+    const safeTitle = (entityData.name || 'perspective').toLowerCase().replace(/[^a-z0-9]/g, '-');
+    link.download = `anything-${safeTitle}-${currentStyle}-${currentFormat}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('✨ Card image downloaded successfully!');
+  } catch (err) {
+    console.error('Download failed due to canvas export restrictions:', err);
+    showToast('⚠️ Export issue: saving without remote media.', true);
+    // Fallback: render without remote image and export
+    loadedImage = null;
+    renderCard();
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.download = `anything-perspective-${currentStyle}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }, 100);
+  }
+}
+
+async function copyCardToClipboard() {
+  const canvas = document.getElementById('shareCanvas');
+  const btn = document.getElementById('btnCopyClipboard');
+  const originalText = btn ? btn.innerHTML : '';
+
+  try {
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        showToast('❌ Failed to create image blob', true);
+        return;
+      }
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        if (btn) btn.innerHTML = '<span>✅</span> Copied!';
+        showToast('📋 High-res image copied to clipboard!');
+        setTimeout(() => {
+          if (btn) btn.innerHTML = originalText;
+        }, 2500);
+      } catch (clipErr) {
+        console.warn('Clipboard write failed, downloading instead', clipErr);
+        downloadShareCard();
+      }
+    }, 'image/png');
+  } catch (err) {
+    console.error('Copy to clipboard failed:', err);
+    downloadShareCard();
+  }
 }
 
 function nativeWebShare() {
   const canvas = document.getElementById('shareCanvas');
-  canvas.toBlob(blob => {
-    const file = new File([blob], 'anything-share-card.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({
-        files: [file],
-        title: `${entityData.name} on anything...`,
-        text: `Check out this perspective on ${entityData.name} on anything...`
-      }).catch(err => console.log('Share canceled or failed', err));
-    } else {
-      downloadShareCard();
-    }
-  });
+  try {
+    canvas.toBlob(blob => {
+      if (!blob) {
+        downloadShareCard();
+        return;
+      }
+      const safeTitle = (entityData.name || 'Perspective').replace(/[^a-zA-Z0-9 ]/g, '');
+      const file = new File([blob], `${safeTitle}-perspective.png`, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: `${entityData.name} on anything...`,
+          text: `Read this perspective on "${entityData.name}" on anything...`
+        }).catch(err => {
+          if (err.name !== 'AbortError') {
+            downloadShareCard();
+          }
+        });
+      } else {
+        downloadShareCard();
+      }
+    }, 'image/png');
+  } catch (err) {
+    console.warn('Native share failed:', err);
+    downloadShareCard();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initStudio);

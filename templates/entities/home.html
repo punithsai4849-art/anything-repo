@@ -250,7 +250,7 @@
       <a href="{% url 'entity_list' %}" class="btn btn-secondary btn-sm">Explore All →</a>
     </div>
 
-    <div class="movie-grid" style="grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.5rem;">
+    <div class="movie-grid">
       {% for entity in popular_entities|slice:":8" %}
       <a href="{% url 'entity_detail' entity.slug %}" class="movie-card" style="display: flex; flex-direction: column; text-decoration: none; color: inherit; height: 100%;">
         <div class="movie-poster-wrap" style="aspect-ratio: 4/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 2px solid #111;">
