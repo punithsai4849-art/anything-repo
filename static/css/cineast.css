@@ -1573,68 +1573,222 @@ textarea.form-control {
   height: 32px;
 }
 
-/* Responsive Media Queries */
-@media (max-width: 900px) {
-  .movie-header-content {
-    grid-template-columns: 200px 1fr;
-    gap: 2rem;
+/* Responsive Media Queries & Mobile Perfection */
+@media (max-width: 992px) {
+  .bento-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.25rem;
   }
-  
-  .share-generator-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .hero-spotlight {
-    min-height: 360px;
-  }
-  
-  .hero-title {
-    font-size: 2.2rem;
-  }
+  .bento-col-12 { grid-column: span 6; }
+  .bento-col-8  { grid-column: span 6; }
+  .bento-col-7  { grid-column: span 6; }
+  .bento-col-6  { grid-column: span 6; }
+  .bento-col-5  { grid-column: span 3; }
+  .bento-col-4  { grid-column: span 3; }
+  .bento-col-3  { grid-column: span 3; }
 }
 
 @media (max-width: 768px) {
+  :root {
+    --shadow-brutal-md: 3px 3px 0px #111111;
+    --shadow-brutal-lg: 4px 4px 0px #111111;
+    --shadow-brutal-xl: 5px 5px 0px #111111;
+  }
+
+  body {
+    padding-bottom: 5.5rem;
+  }
+
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Bento Grid Mobile 1-Column Collapse */
+  .bento-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .bento-col-12,
+  .bento-col-8,
+  .bento-col-7,
+  .bento-col-6,
+  .bento-col-5,
+  .bento-col-4,
+  .bento-col-3 {
+    grid-column: span 1 !important;
+  }
+
+  .bento-row-2,
+  .bento-row-1 {
+    grid-row: auto !important;
+  }
+
+  .bento-card {
+    padding: 1.25rem !important;
+    min-height: auto !important;
+  }
+
+  /* Header & Navigation */
+  .site-header {
+    height: 60px;
+  }
+
   .site-header .nav-menu,
   .site-header .header-search-form {
     display: none;
   }
-  
+
+  .brand-logo-link span {
+    font-size: 1.45rem !important;
+  }
+
+  /* Mobile Bottom Navigation Bar */
   .mobile-bottom-nav {
     display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 2.5px solid #111111;
+    z-index: 10000;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
   }
-  
-  .main-content {
-    padding-bottom: 5.5rem;
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    gap: 2px;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast);
   }
-  
-  .movie-header-content {
-    grid-template-columns: 1fr;
+
+  .mobile-nav-item.active,
+  .mobile-nav-item:hover {
+    color: var(--cineast-primary);
+  }
+
+  .mobile-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Entity Detail Page on Mobile */
+  .entity-hero-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
     text-align: center;
   }
-  
-  .movie-header-poster {
-    max-width: 220px;
-    margin: 0 auto;
+
+  .entity-hero-media-box {
+    margin: 0 auto !important;
+    max-width: 200px !important;
+    width: 100% !important;
   }
-  
-  .movie-header-info {
-    align-items: center;
+
+  .entity-action-bar {
+    justify-content: center !important;
   }
-  
-  .movie-genres,
-  .movie-header-actions,
-  .movie-header-meta {
-    justify-content: center;
+
+  /* Share Card Studio Layout on Mobile */
+  .share-studio-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
   }
-  
-  .hero-content {
-    padding: 1.75rem;
+
+  .share-canvas-box {
+    order: -1; /* Show live canvas preview at the top on mobile */
+    max-width: 100% !important;
   }
-  
-  .hero-title {
-    font-size: 1.85rem;
+
+  #shareCanvas {
+    max-height: 380px !important;
+  }
+
+  /* Forms on Mobile */
+  .form-container-card {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .dynamic-fields-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .category-grid-selector {
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)) !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Movie Grid & Discovery on Mobile */
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  .movie-card {
+    padding: 0.5rem !important;
+  }
+
+  .cat-pill {
+    padding: 0.5rem 0.35rem !important;
+  }
+
+  .cat-pill div {
+    font-size: 0.8rem !important;
+  }
+
+
+  /* Modals on Mobile */
+  .cineast-modal-dialog {
+    width: 94vw !important;
+    max-width: 94vw !important;
+    padding: 1.5rem !important;
+    margin: 1rem auto !important;
+  }
+
+  /* Tour Modal on Mobile */
+  .tour-card {
+    padding: 1.5rem !important;
+    max-width: 94vw !important;
+  }
+
+  .tour-title {
+    font-size: 1.35rem !important;
+  }
+
+  .tour-desc {
+    font-size: 0.9rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .tour-feature-list {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .tour-feature-item {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
   }
 }
+
 
 /* ==========================================================================
    LIVELY MICRO-ANIMATIONS & INTERACTIVE MOTION

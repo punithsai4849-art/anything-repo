@@ -18,10 +18,10 @@
     </p>
   </div>
 
-  <div style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 3rem; align-items: start; max-width: 1050px; margin: 0 auto;">
+  <div class="share-studio-grid" style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 2.5rem; align-items: start; max-width: 1050px; margin: 0 auto;">
     
     <!-- Controls Column -->
-    <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-md); padding: 2rem;">
+    <div style="background: var(--bg-card); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-md); padding: 1.75rem;">
       
       <!-- Format Picker -->
       <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -68,12 +68,12 @@
     </div>
 
     <!-- Live Canvas Studio Preview Column -->
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div class="share-canvas-box" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
       <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.75rem;">
         Live Render Preview
       </div>
       
-      <div style="background: #e8e8e8; border: 2.5px solid #111; border-radius: var(--radius-lg); box-shadow: var(--shadow-brutal-lg); padding: 1rem; max-width: 100%; display: flex; justify-content: center; overflow: hidden;">
+      <div style="background: #e8e8e8; border: 2.5px solid #111; border-radius: var(--radius-lg); box-shadow: var(--shadow-brutal-lg); padding: 1rem; max-width: 100%; width: 100%; display: flex; justify-content: center; overflow: hidden; box-sizing: border-box;">
         <canvas id="shareCanvas" width="1080" height="1920" style="max-width: 100%; max-height: 520px; width: auto; height: auto; border-radius: 8px; border: 1.5px solid #222; background: #fff;"></canvas>
       </div>
     </div>
@@ -99,7 +99,11 @@ const entityData = {
 let loadedImage = null;
 
 function initStudio() {
-  if (entityData.imageUrl) {
+  let imgUrl = entityData.imageUrl;
+  if (imgUrl) {
+    if (imgUrl.startsWith('/')) {
+      imgUrl = window.location.origin + imgUrl;
+    }
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
@@ -107,14 +111,24 @@ function initStudio() {
       renderCard();
     };
     img.onerror = () => {
-      loadedImage = null;
-      renderCard();
+      // Fallback: Retry without crossOrigin
+      const fallbackImg = new Image();
+      fallbackImg.onload = () => {
+        loadedImage = fallbackImg;
+        renderCard();
+      };
+      fallbackImg.onerror = () => {
+        loadedImage = null;
+        renderCard();
+      };
+      fallbackImg.src = imgUrl;
     };
-    img.src = entityData.imageUrl;
+    img.src = imgUrl;
   } else {
     renderCard();
   }
 }
+
 
 function setShareFormat(fmt, btn) {
   currentFormat = fmt;

@@ -15,13 +15,13 @@
     </p>
   </div>
 
-  <form action="{% url 'entity_add' %}" method="POST" enctype="multipart/form-data" style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem;">
+  <form action="{% url 'entity_add' %}" method="POST" enctype="multipart/form-data" class="form-container-card" style="background: var(--glass-card); backdrop-filter: blur(20px); border: 2.5px solid #111; border-radius: var(--radius-xl); box-shadow: var(--shadow-brutal-lg); padding: 2.5rem;">
     {% csrf_token %}
 
     <!-- 1. Category Selection -->
     <div class="form-group" style="margin-bottom: 2rem;">
       <label class="form-label" style="font-size: 1.05rem;">1. Select Category *</label>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+      <div class="category-grid-selector" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
         {% for cat in categories %}
         <label class="category-radio-card" style="cursor: pointer;">
           <input type="radio" name="category_id" value="{{ cat.id }}" {% if forloop.first %}checked{% endif %} onchange="updateDynamicMetadataFields('{{ cat.slug }}')" style="display: none;">
@@ -37,7 +37,7 @@
     <!-- 2. Name & Description -->
     <div class="form-group">
       <label class="form-label">2. Entity Name *</label>
-      <input type="text" name="name" class="form-control" placeholder="e.g. Interstellar, iPhone 16 Pro, Hyderabad, Nostalgia..." required style="font-size: 1.1rem;">
+      <input type="text" name="name" class="form-control" placeholder="e.g. Bohemian Rhapsody, Interstellar, iPhone..." required style="font-size: 1.1rem;">
     </div>
 
     <div class="form-group">
@@ -49,10 +49,11 @@
     <div id="dynamicFieldsContainer" style="margin-bottom: 1.75rem; background: var(--bg-subtle); border: 2px solid #111; border-radius: var(--radius-lg); padding: 1.5rem;">
       <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem;" id="dynamicFieldsTitle">Category Details</h4>
       
-      <div id="dynamicFieldsInputs" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div id="dynamicFieldsInputs" class="dynamic-fields-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <!-- Injected via JavaScript based on selected category -->
       </div>
     </div>
+
 
     <!-- 4. Tags -->
     <div class="form-group">
