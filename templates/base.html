@@ -14,7 +14,35 @@
 </head>
 <body data-show-tour="{% if show_tour or request.session.show_new_user_tour %}true{% endif %}">
 
-
+  <!-- anything... Cinematic Logo Intro Splash Overlay -->
+  <div id="siteIntroOverlay" class="site-intro-overlay" aria-hidden="true">
+    <div class="site-intro-backdrop"></div>
+    <div class="site-intro-content">
+      <div class="site-intro-logo">
+        <span class="intro-word">anything</span><span class="intro-dots"><span class="intro-dot intro-dot-1">.</span><span class="intro-dot intro-dot-2">.</span><span class="intro-dot intro-dot-3">.</span></span>
+      </div>
+      <div class="site-intro-tagline">
+        The universal platform to evaluate, review, and discuss anything
+      </div>
+      <div class="site-intro-bar">
+        <div class="site-intro-progress"></div>
+      </div>
+      <button type="button" class="site-intro-skip" id="btnIntroSkip" onclick="dismissIntroOverlay()">
+        Enter Website →
+      </button>
+    </div>
+  </div>
+  <script>
+    (function() {
+      try {
+        var urlParams = new URLSearchParams(window.location.search);
+        if (sessionStorage.getItem('anything_intro_seen') && !urlParams.has('intro')) {
+          var el = document.getElementById('siteIntroOverlay');
+          if (el) el.style.display = 'none';
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <!-- Site Header -->
   <header class="site-header" id="siteHeader">

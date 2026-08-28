@@ -316,5 +316,53 @@ document.addEventListener('DOMContentLoaded', () => {
       window.startOnboardingTour(true);
     }, 600);
   }
+
+  // Initialize Cinematic Logo Intro
+  initSiteIntro();
 });
+
+/* ==========================================================================
+   CINEMATIC LOGO INTRO CONTROLLER
+   ========================================================================== */
+window.dismissIntroOverlay = function() {
+  const overlay = document.getElementById('siteIntroOverlay');
+  if (!overlay || overlay.classList.contains('intro-hidden')) return;
+
+  overlay.classList.add('intro-hidden');
+  try {
+    sessionStorage.setItem('anything_intro_seen', 'true');
+  } catch (e) {}
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 700);
+};
+
+function initSiteIntro() {
+  const overlay = document.getElementById('siteIntroOverlay');
+  if (!overlay) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceIntro = urlParams.has('intro');
+  let hasSeen = false;
+
+  try {
+    hasSeen = sessionStorage.getItem('anything_intro_seen') === 'true';
+  } catch (e) {}
+
+  if (hasSeen && !forceIntro) {
+    overlay.style.display = 'none';
+    return;
+  }
+
+  // Tap/click anywhere on screen to enter immediately
+  overlay.addEventListener('click', () => {
+    window.dismissIntroOverlay();
+  });
+
+  // Auto-dismiss smoothly when the logo sequence finishes (~1.9s)
+  setTimeout(() => {
+    window.dismissIntroOverlay();
+  }, 1900);
+}
 
